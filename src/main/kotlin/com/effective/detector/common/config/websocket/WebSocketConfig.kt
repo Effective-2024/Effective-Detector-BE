@@ -17,7 +17,7 @@ class WebSocketConfig : WebSocketMessageBrokerConfigurer {
 
     override fun registerStompEndpoints(registry: StompEndpointRegistry) {
         registry.addEndpoint("/image-stream")
-            .setAllowedOriginPatterns("http://localhost:3000")
+            .setAllowedOriginPatterns("*")
             .withSockJS() // STOMP 엔드포인트를 설정하고, SockJS 지원을 추가합니다.
     }
 }
