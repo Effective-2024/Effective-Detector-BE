@@ -14,7 +14,8 @@ import java.util.Base64
 
 @Controller
 class StreamController(
-    private val images: MutableList<ByteArray> = ArrayList(),
+    private val images: MutableList<ByteArray> = ArrayList(), // 큐로 바꾸자?
+    // 최근 10초간의 이미지를 저장하는 큐 도입 -> 최근꺼 조회하기.
     private val s3Client: AmazonS3,
 ) {
 
@@ -24,7 +25,8 @@ class StreamController(
         images.add(image)
     }
 
-    @Scheduled(fixedRate = 600000) // 10분마다 실행
+    @Scheduled(fixedRate = 600000) // 10분마다 실행 -> 30분?
+    // 2020-12-01-00:00:00~00:30:00.mp3 이렇게 저장해서 시간대별로 조회가 가능하게끔?
     @Throws(IOException::class, InterruptedException::class)
     fun createVideo() {
         if (images.isEmpty()) return
