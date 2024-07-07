@@ -10,10 +10,10 @@ class Member(
     private var loginId: String? = null,
 
     @Column(nullable = false)
-    private val loginPassword: String? = null,
+    private var loginPassword: String? = null,
 
     @Column(nullable = false)
-    private val name: String? = null,
+    private var name: String? = null,
 
     @Column(unique = true)
     private var tel: String? = null,

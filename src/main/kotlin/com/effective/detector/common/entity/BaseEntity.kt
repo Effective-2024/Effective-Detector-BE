@@ -12,11 +12,12 @@ import java.time.LocalDateTime
 open class BaseEntity : Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private val id: Long? = null
+    open val id: Long? = null
 
     @CreatedDate
-    private val createdDate: LocalDateTime? = null
+    @Column(updatable = false)
+    protected var createdDate: LocalDateTime? = null
 
     @LastModifiedDate
-    private val modifiedDate: LocalDateTime? = null
+    protected var modifiedDate: LocalDateTime? = null
 }
