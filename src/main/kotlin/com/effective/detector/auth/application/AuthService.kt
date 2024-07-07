@@ -34,6 +34,7 @@ class AuthService(
             name = request.hospitalName,
             tel = request.hospitalTel,
             address = request.hospitalAddress,
+            hospitalType = request.hospitalType,
         )
         member.addHospital(hospital)
         memberService.save(member)
