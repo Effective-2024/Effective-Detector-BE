@@ -10,17 +10,21 @@ class Member(
     private var loginId: String? = null,
 
     @Column(nullable = false)
-    private var loginPassword: String? = null,
+    var loginPassword: String? = null,
 
     @Column(nullable = false)
-    private var name: String? = null,
+    var name: String? = null,
 
     @Column(unique = true)
-    private var tel: String? = null,
+    var tel: String? = null,
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private var memberRole: MemberRole? = null,
+    var memberRole: MemberRole? = null,
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    var memberStatus: MemberStatus? = null,
 ) : BaseEntity() {
 
     @OneToMany(mappedBy = "member", cascade = [CascadeType.ALL], orphanRemoval = true)

@@ -38,3 +38,11 @@ out/
 
 ### Kotlin ###
 .kotlin
+
+### application.properties ###
+.appication-local.yml
+*.appication-local.yml
+._.appication-local.yml
+**/.appication-local.yml
+**/._.appication-local.yml
+src/main/resources/application-local.yml
