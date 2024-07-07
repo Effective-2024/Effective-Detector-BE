@@ -36,6 +36,8 @@ dependencies {
     // Websocket
     implementation("org.springframework.boot:spring-boot-starter-websocket")
 
+    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0")
+
     developmentOnly("org.springframework.boot:spring-boot-devtools")
     runtimeOnly("org.postgresql:postgresql")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
