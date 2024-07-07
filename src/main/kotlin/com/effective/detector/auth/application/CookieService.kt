@@ -25,7 +25,7 @@ class CookieService(
         return this.makeCookie("access_token", token, 604800)
     }
 
-    private fun makeCookie(key: String, value: String, maxAge: Int): Cookie {
+    private fun makeCookie(key: String, value: String?, maxAge: Int): Cookie {
         val cookie = Cookie(key, value)
         if (activeProfile == "prod") {
             cookie.secure = true
@@ -35,5 +35,9 @@ class CookieService(
         cookie.domain = domain
         cookie.maxAge = maxAge
         return cookie
+    }
+
+    fun deleteAccessTokenCookie(): Cookie? {
+        return this.makeCookie("access_token", null, 0)
     }
 }

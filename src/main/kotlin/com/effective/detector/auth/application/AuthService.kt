@@ -6,6 +6,7 @@ import com.effective.detector.auth.api.dto.MemberMeResponse
 import com.effective.detector.auth.api.dto.SignupRequest
 import com.effective.detector.common.error.BusinessError
 import com.effective.detector.common.error.BusinessException
+import com.effective.detector.common.helper.AuthorizationHelper
 import com.effective.detector.hospital.application.HospitalService
 import com.effective.detector.hospital.domain.Hospital
 import com.effective.detector.member.application.MemberService
@@ -29,6 +30,7 @@ class AuthService(
     private val hospitalService: HospitalService,
     private val authenticationManager: AuthenticationManager,
     private val cookieService: CookieService,
+    private val authorizationHelper: AuthorizationHelper,
 ) {
 
     @Transactional
@@ -72,5 +74,19 @@ class AuthService(
 
     private fun getAuthenticationFromIdPassword(loginId: String, loginPassword: String): Authentication {
         return authenticationManager.authenticate(UsernamePasswordAuthenticationToken(loginId, loginPassword))
+    }
+
+    fun getMemberInfo(response: HttpServletResponse): MemberMeResponse? {
+        val id: Long = authorizationHelper.getMyId().toLong()
+        val member: Member = memberService.getById(id)
+        if (authorizationHelper.getMyRole() != member.memberRole) {
+            this.logout(response)
+            throw BusinessException(BusinessError.MEMBER_ROLE_NOT_MATCHED)
+        }
+        return memberService.getMemberMeById(id)
+    }
+
+    fun logout(response: HttpServletResponse) {
+        response.addCookie(cookieService.deleteAccessTokenCookie())
     }
 }

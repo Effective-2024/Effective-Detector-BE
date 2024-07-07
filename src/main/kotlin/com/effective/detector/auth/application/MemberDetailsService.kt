@@ -16,8 +16,8 @@ class MemberDetailsService(
 
     @Transactional(readOnly = true)
     override fun loadUserByUsername(loginId: String): UserDetails {
-        val member = (memberRepository.findByLoginId(loginId)
-            ?: throw UsernameNotFoundException(BusinessError.MEMBER_NOT_FOUND.message))
+        val member = memberRepository.findByLoginId(loginId)
+            ?: throw UsernameNotFoundException(BusinessError.MEMBER_NOT_FOUND.message)
         return LoginIdAdapterImpl(member)
     }
 }

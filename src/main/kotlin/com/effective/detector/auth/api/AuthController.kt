@@ -10,10 +10,7 @@ import jakarta.servlet.http.HttpServletResponse
 import jakarta.validation.Valid
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 
 @Tag(name = "[Auth] 로그인 및 회원가입", description = "인증 관련 기능")
 @RestController
@@ -38,5 +35,22 @@ class AuthController(
         @RequestBody @Valid loginDto: LoginRequest,
     ): ResponseEntity<MemberMeResponse> {
         return ResponseEntity.ok(authService.login(response, loginDto))
+    }
+
+    @Operation(summary = "로그아웃")
+    @PreAuthorize("permitAll()")
+    @PostMapping("/logout")
+    fun logout(response: HttpServletResponse): ResponseEntity<Void> {
+        authService.logout(response)
+        return ResponseEntity.ok().build()
+    }
+
+    @Operation(summary = "내 정보 조회")
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/members/me")
+    fun getMemberInfo(
+        response: HttpServletResponse,
+    ): ResponseEntity<MemberMeResponse> {
+        return ResponseEntity.ok(authService.getMemberInfo(response))
     }
 }

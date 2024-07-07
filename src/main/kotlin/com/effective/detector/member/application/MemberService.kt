@@ -3,6 +3,7 @@ package com.effective.detector.member.application
 import com.effective.detector.auth.api.dto.MemberMeResponse
 import com.effective.detector.common.error.BusinessError
 import com.effective.detector.common.error.BusinessException
+import com.effective.detector.common.util.findByIdOrThrow
 import com.effective.detector.member.domain.Member
 import com.effective.detector.member.domain.MemberRepository
 import org.springframework.stereotype.Service
@@ -39,5 +40,9 @@ class MemberService(
             name = member.name,
             memberRole = member.memberRole,
         )
+    }
+
+    fun getById(id: Long): Member {
+        return memberRepository.findByIdOrThrow(id)
     }
 }
