@@ -17,3 +17,9 @@ cloud:
     credentials:
       access-key:
       secret-key:
+
+cookie:
+  domain: localhost
+
+jwt:
+  secret: secret
