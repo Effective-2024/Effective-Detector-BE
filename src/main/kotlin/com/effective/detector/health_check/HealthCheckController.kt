@@ -11,4 +11,9 @@ class HealthCheckController {
     fun healthCheck(): ResponseEntity<String> {
         return ResponseEntity.ok("ok")
     }
+
+    @GetMapping("/cicd-test")
+    fun cicdTest(): ResponseEntity<String> {
+        return ResponseEntity.ok("ok")
+    }
 }

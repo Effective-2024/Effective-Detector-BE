@@ -13,9 +13,6 @@ class CookieService(
     @Value("\${cookie.domain}")
     private lateinit var domain: String
 
-    @Value("\${spring.profiles.active}")
-    private lateinit var activeProfile: String
-
     fun authenticate(id: Long?, memberRole: MemberRole, response: HttpServletResponse) {
         val accessToken: String = jwtService.generateAccessToken(id, memberRole)
         response.addCookie(this.makeAccessTokenCookie(accessToken))
@@ -27,9 +24,7 @@ class CookieService(
 
     private fun makeCookie(key: String, value: String?, maxAge: Int): Cookie {
         val cookie = Cookie(key, value)
-        if (activeProfile == "prod") {
-            cookie.secure = true
-        }
+        cookie.secure = true
         cookie.isHttpOnly = true
         cookie.path = "/"
         cookie.domain = domain
