@@ -6,12 +6,12 @@ on:
   workflow_dispatch:
 
 env:
-  AWS_REGION: ap-northeast-2                          # set this to your preferred AWS region, e.g. us-west-1
-  ECR_REPOSITORY: hospital-server                     # set this to your Amazon ECR repository name
-  ECS_SERVICE: hospital-service                       # set this to your Amazon ECS service name
-  ECS_CLUSTER: effective-cluster                      # set this to your Amazon ECS cluster name
-  ECS_TASK_DEFINITION: task-definition.json           # set this to the path to your Amazon ECS task definition
-  CONTAINER_NAME_SERVER: hospital                            # set this to the name of the container in the containerDefinitions section of your task definition
+  AWS_REGION: ap-northeast-2                        # set this to your preferred AWS region, e.g. us-west-1
+  ECR_REPOSITORY: hospital-server                   # set this to your Amazon ECR repository name
+  ECS_SERVICE: hospital-service                     # set this to your Amazon ECS service name
+  ECS_CLUSTER: backend-cluster                      # set this to your Amazon ECS cluster name
+  ECS_TASK_DEFINITION: task-definition.json         # set this to the path to your Amazon ECS task definition
+  CONTAINER_NAME_SERVER: hospital                   # set this to the name of the container in the containerDefinitions section of your task definition
   IMAGE_TAG_SERVER: ${{ github.sha }}
 
 permissions:
