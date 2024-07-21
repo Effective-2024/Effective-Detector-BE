@@ -11,7 +11,7 @@ env:
   ECS_SERVICE: hospital-service                       # set this to your Amazon ECS service name
   ECS_CLUSTER: effective-cluster                      # set this to your Amazon ECS cluster name
   ECS_TASK_DEFINITION: task-definition.json           # set this to the path to your Amazon ECS task definition
-  CONTAINER_NAME: hospital                            # set this to the name of the container in the containerDefinitions section of your task definition
+  CONTAINER_NAME_SERVER: hospital                            # set this to the name of the container in the containerDefinitions section of your task definition
   IMAGE_TAG_SERVER: ${{ github.sha }}
 
 permissions:
@@ -21,25 +21,16 @@ jobs:
   deploy:
     name: Deploy
     runs-on: ubuntu-latest
-    concurrency:
-      group: ${{ github.ref }}-deploy
-      cancel-in-progress: true
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v3
 
       - name: Setup JDK
         uses: actions/setup-java@v3
         with:
           java-version: 17
           distribution: temurin
-
-      - name: Set YML
-        run: |
-          mkdir -p src/main/resources
-          echo "${{ secrets.APPLICATION_YML }}" | base64 --decode > src/main/resources/application.yml
-          find src
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
@@ -48,7 +39,7 @@ jobs:
         run: ./gradlew build
 
       - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v2
+        uses: aws-actions/configure-aws-credentials@v1
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -72,7 +63,7 @@ jobs:
         uses: aws-actions/amazon-ecs-render-task-definition@v1
         with:
           task-definition: ${{ env.ECS_TASK_DEFINITION }}
-          container-name: ${{ env.CONTAINER_NAME }}
+          container-name: ${{ env.CONTAINER_NAME_SERVER }}
           image: ${{ env.server_image }}
 
       - name: Deploy Amazon ECS task definition
