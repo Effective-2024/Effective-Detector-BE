@@ -40,9 +40,9 @@ out/
 .kotlin
 
 ### application.properties ###
-.appication-local.yml
-*.appication-local.yml
-._.appication-local.yml
-**/.appication-local.yml
-**/._.appication-local.yml
-src/main/resources/application-local.yml
+.appication.yml
+*.appication.yml
+._.appication.yml
+**/.appication.yml
+**/._.appication.yml
+src/main/resources/application.yml
