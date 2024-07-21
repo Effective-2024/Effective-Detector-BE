@@ -5,6 +5,7 @@ import com.effective.detector.auth.api.dto.MemberMeResponse
 import com.effective.detector.auth.api.dto.SignupRequest
 import com.effective.detector.auth.application.AuthService
 import com.effective.detector.common.annotation.LoginMember
+import com.effective.detector.member.application.MemberService
 import com.effective.detector.member.domain.Member
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.*
 @RequestMapping("/auth")
 class AuthController(
     private val authService: AuthService,
+    private val memberService: MemberService,
 ) {
 
     @Operation(summary = "회원가입 & 병원 등록")
@@ -56,5 +58,18 @@ class AuthController(
         @LoginMember member: Member,
     ): ResponseEntity<MemberMeResponse> {
         return ResponseEntity.ok(authService.getMemberInfo(response, member))
+    }
+
+    @Operation(summary = "아이디 중복 확인")
+    @PreAuthorize("permitAll()")
+    @GetMapping("/login-id/{login-id}")
+    fun checkLoginId(
+        @PathVariable("login-id") loginId: @Valid @Pattern(
+            regexp = "^[a-zA-Z0-9_-]{8,32}$",
+            message = "아이디는 8~32자의 영문 대소문자, 숫자, -, _만 사용 가능합니다."
+        ) String?,
+    ): ResponseEntity<Void> {
+        memberService.checkLoginIdDuplicated(loginId)
+        return ResponseEntity.ok().build()
     }
 }
