@@ -4,10 +4,13 @@ import com.effective.detector.auth.api.dto.LoginRequest
 import com.effective.detector.auth.api.dto.MemberMeResponse
 import com.effective.detector.auth.api.dto.SignupRequest
 import com.effective.detector.auth.application.AuthService
+import com.effective.detector.common.annotation.LoginMember
+import com.effective.detector.member.domain.Member
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.servlet.http.HttpServletResponse
 import jakarta.validation.Valid
+import jakarta.validation.constraints.Pattern
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
@@ -50,7 +53,8 @@ class AuthController(
     @GetMapping("/members/me")
     fun getMemberInfo(
         response: HttpServletResponse,
+        @LoginMember member: Member,
     ): ResponseEntity<MemberMeResponse> {
-        return ResponseEntity.ok(authService.getMemberInfo(response))
+        return ResponseEntity.ok(authService.getMemberInfo(response, member))
     }
 }
