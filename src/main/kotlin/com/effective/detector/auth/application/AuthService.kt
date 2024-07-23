@@ -76,14 +76,12 @@ class AuthService(
         return authenticationManager.authenticate(UsernamePasswordAuthenticationToken(loginId, loginPassword))
     }
 
-    fun getMemberInfo(response: HttpServletResponse): MemberMeResponse? {
-        val id: Long = authorizationHelper.getMyId().toLong()
-        val member: Member = memberService.getById(id)
+    fun getMemberInfo(response: HttpServletResponse, member: Member): MemberMeResponse? {
         if (authorizationHelper.getMyRole() != member.memberRole) {
             this.logout(response)
             throw BusinessException(BusinessError.MEMBER_ROLE_NOT_MATCHED)
         }
-        return memberService.getMemberMeById(id)
+        return memberService.getMemberMeById(member.id)
     }
 
     fun logout(response: HttpServletResponse) {

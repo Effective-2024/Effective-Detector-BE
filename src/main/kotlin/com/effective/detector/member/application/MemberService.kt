@@ -45,4 +45,10 @@ class MemberService(
     fun getById(id: Long): Member {
         return memberRepository.findByIdOrThrow(id)
     }
+
+    fun checkLoginIdDuplicated(loginId: String?) {
+        if (memberRepository.existsByLoginId(loginId)) {
+            throw BusinessException(BusinessError.LOGIN_ID_DUPLICATED)
+        }
+    }
 }
