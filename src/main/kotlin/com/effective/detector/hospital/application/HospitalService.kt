@@ -1,24 +1,26 @@
 package com.effective.detector.hospital.application
 
-import com.effective.detector.common.error.BusinessError
-import com.effective.detector.common.error.BusinessException
+import com.effective.detector.common.util.findByIdOrThrow
+import com.effective.detector.hospital.api.dto.HospitalResponse
 import com.effective.detector.hospital.domain.Hospital
 import com.effective.detector.hospital.domain.HospitalRepository
-import jakarta.transaction.Transactional
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 
 @Service
+@Transactional(readOnly = true)
 class HospitalService(
     private val hospitalRepository: HospitalRepository,
 ) {
-    fun validatedTel(hospitalTel: String) {
-        hospitalRepository.findByTel(hospitalTel)?.let {
-            throw BusinessException(BusinessError.HOSPITAL_TEL_DUPLICATED)
-        }
+
+    fun findHospital(id: Long): Hospital {
+        return hospitalRepository.findByIdOrThrow(id)
     }
 
-    @Transactional
-    fun save(hospital: Hospital) {
-        hospitalRepository.save(hospital)
+    fun findHospitalsByKeyword(keyword: String?): List<HospitalResponse> {
+        return if (keyword.isNullOrBlank())
+            hospitalRepository.findAll().map { HospitalResponse.from(it) }
+        else
+            hospitalRepository.findByNameContaining(keyword).map { HospitalResponse.from(it) }
     }
 }
