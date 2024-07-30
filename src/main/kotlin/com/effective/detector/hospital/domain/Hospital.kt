@@ -1,23 +1,39 @@
 package com.effective.detector.hospital.domain
 
 import com.effective.detector.common.entity.BaseEntity
+import com.effective.detector.hospital.domain.HospitalType.HOSPITAL
 import com.effective.detector.member.domain.MemberHospital
 import jakarta.persistence.*
 
 @Entity
 class Hospital(
     @Column(nullable = false)
-    private val name: String? = null,
+    val name: String? = null,
 
     @Column(unique = true)
-    private var tel: String? = null,
+    var tel: String? = null,
 
-    @Enumerated(EnumType.STRING)
+    @Convert(converter = HospitalTypeConverter::class)
     @Column(nullable = false)
-    private var hospitalType: HospitalType? = null,
+    var type: HospitalType? = HOSPITAL,
 
     @Column(nullable = false)
-    private val address: String? = null,
+    val address: String? = null,
+
+    @Column(nullable = false)
+    private val medicalPersonCount: Int? = 0,
+
+    @Column(nullable = false)
+    private val roomCount: Int? = 0,
+
+    @Column(nullable = false)
+    private val bedCount: Int? = 0,
+
+    @Column(nullable = false)
+    private val area: Double? = 0.0,
+
+    @Column(nullable = false)
+    private val department: String? = null,
 ) : BaseEntity() {
 
     @OneToMany(mappedBy = "hospital", cascade = [CascadeType.ALL], orphanRemoval = true)

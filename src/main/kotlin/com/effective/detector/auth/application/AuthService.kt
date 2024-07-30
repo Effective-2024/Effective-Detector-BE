@@ -35,9 +35,9 @@ class AuthService(
 
     @Transactional
     fun signup(request: SignupRequest) {
-        memberService.validatedLoginId(request.loginId)
-        memberService.validatedTel(request.adminTel)
-        hospitalService.validatedTel(request.hospitalTel)
+        memberService.validatedLoginId(request.loginId!!)
+        memberService.validatedTel(request.adminTel!!)
+        val hospital = hospitalService.findHospital(request.hospitalId!!)
 
         val member = Member(
             loginId = request.loginId,
@@ -47,15 +47,8 @@ class AuthService(
             memberRole = MemberRole.ROLE_ADMIN,
             memberStatus = MemberStatus.ACTIVE,
         )
-        val hospital = Hospital(
-            name = request.hospitalName,
-            tel = request.hospitalTel,
-            address = request.hospitalAddress,
-            hospitalType = request.hospitalType,
-        )
         member.addHospital(hospital)
         memberService.save(member)
-        hospitalService.save(hospital)
     }
 
     fun login(response: HttpServletResponse, loginDto: LoginRequest): MemberMeResponse {
