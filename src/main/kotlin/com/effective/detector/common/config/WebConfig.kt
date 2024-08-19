@@ -1,4 +1,4 @@
-package com.effective.detector.common.config.web
+package com.effective.detector.common.config
 
 import com.effective.detector.common.annotation.MemberArgumentResolver
 import org.springframework.context.annotation.Configuration

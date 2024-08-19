@@ -1,4 +1,4 @@
-package com.effective.detector.common.config.websocket
+package com.effective.detector.common.config
 
 import org.springframework.context.annotation.Configuration
 import org.springframework.messaging.converter.MappingJackson2MessageConverter
