@@ -1,4 +1,4 @@
-package com.effective.detector.common.config.aws
+package com.effective.detector.common.config
 
 import com.amazonaws.auth.AWSCredentials
 import com.amazonaws.auth.AWSStaticCredentialsProvider

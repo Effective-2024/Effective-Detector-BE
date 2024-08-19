@@ -1,4 +1,4 @@
-package com.effective.detector.common.config.security
+package com.effective.detector.common.config
 
 import com.effective.detector.member.domain.MemberRole.*
 
@@ -18,6 +18,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
+import org.springframework.web.cors.CorsConfigurationSource
 
 @EnableMethodSecurity
 @EnableWebSecurity
@@ -26,6 +27,7 @@ class SecurityConfig(
     private val jwtAuthorizationFilter: JwtAuthorizationFilter,
     private val jwtAccessDeniedHandler: JwtAccessDeniedHandler,
     private val jwtAuthenticationEntryPoint: JwtAuthenticationEntryPoint,
+    private val corsConfigurationSource: CorsConfigurationSource,
 ) {
 
     @Bean
@@ -41,7 +43,7 @@ class SecurityConfig(
     @Bean
     fun filterChain(http: HttpSecurity): SecurityFilterChain {
         http.csrf().disable()
-            .cors().and()
+            .cors().configurationSource(corsConfigurationSource).and()
             .formLogin().disable()
             .logout().disable()
             .sessionManagement()
