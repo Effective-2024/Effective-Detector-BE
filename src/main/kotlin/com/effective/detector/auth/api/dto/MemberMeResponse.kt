@@ -6,4 +6,5 @@ data class MemberMeResponse(
     val id: Long? = null,
     val name: String? = null,
     val memberRole: MemberRole? = null,
+    val accessToken: String? = null,
 )

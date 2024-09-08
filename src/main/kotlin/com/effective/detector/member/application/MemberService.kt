@@ -31,7 +31,7 @@ class MemberService(
         memberRepository.save(member)
     }
 
-    fun getMemberMeById(id: Long?): MemberMeResponse {
+    fun getMemberMeById(id: Long?, accessToken: String?): MemberMeResponse {
         val member = memberRepository.findById(id!!).orElseThrow {
             BusinessException(BusinessError.ID_NOT_FOUND)
         }
@@ -39,6 +39,7 @@ class MemberService(
             id = member.id,
             name = member.name,
             memberRole = member.memberRole,
+            accessToken = accessToken,
         )
     }
 

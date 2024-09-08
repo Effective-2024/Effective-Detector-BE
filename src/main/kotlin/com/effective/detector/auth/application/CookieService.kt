@@ -13,9 +13,10 @@ class CookieService(
     @Value("\${cookie.domain}")
     private lateinit var domain: String
 
-    fun authenticate(id: Long?, memberRole: MemberRole, response: HttpServletResponse) {
+    fun authenticate(id: Long?, memberRole: MemberRole, response: HttpServletResponse): String {
         val accessToken: String = jwtService.generateAccessToken(id, memberRole)
         response.addCookie(this.makeAccessTokenCookie(accessToken))
+        return accessToken
     }
 
     private fun makeAccessTokenCookie(token: String): Cookie {
