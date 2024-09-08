@@ -61,8 +61,8 @@ class AuthService(
             throw BusinessException(BusinessError.ID_PASSWORD_AUTH_FAILED)
         }
         val adapter: AuthenticationAdapter = authentication.principal as AuthenticationAdapter
-        cookieService.authenticate(adapter.getId(), adapter.getMemberRole(), response)
-        return memberService.getMemberMeById(adapter.getId())
+        val accessToken = cookieService.authenticate(adapter.getId(), adapter.getMemberRole(), response)
+        return memberService.getMemberMeById(adapter.getId(), accessToken)
     }
 
     private fun getAuthenticationFromIdPassword(loginId: String, loginPassword: String): Authentication {
@@ -74,7 +74,7 @@ class AuthService(
             this.logout(response)
             throw BusinessException(BusinessError.MEMBER_ROLE_NOT_MATCHED)
         }
-        return memberService.getMemberMeById(member.id)
+        return memberService.getMemberMeById(member.id, null)
     }
 
     fun logout(response: HttpServletResponse) {
