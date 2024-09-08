@@ -1,13 +1,14 @@
 package com.effective.detector.hospital.api.dto
 
 import com.effective.detector.hospital.domain.Hospital
+import com.effective.detector.hospital.domain.HospitalType
 
 data class HospitalResponse(
-    val id: Long,
+    val id: Long? = null,
     val name: String? = null,
-    val type: String? = null,
-    val address: String? = null,
     val tel: String? = null,
+    val type: HospitalType? = null,
+    val address: String? = null,
 ) {
     companion object {
         fun from(
@@ -16,7 +17,7 @@ data class HospitalResponse(
             return HospitalResponse(
                 id = hospital.id!!,
                 name = hospital.name,
-                type = hospital.type?.value,
+                type = hospital.type,
                 address = hospital.address,
                 tel = hospital.tel,
             )
