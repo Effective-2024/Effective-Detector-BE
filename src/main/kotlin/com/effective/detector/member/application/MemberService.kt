@@ -1,9 +1,12 @@
 package com.effective.detector.member.application
 
-import com.effective.detector.auth.api.dto.MemberMeResponse
+import com.effective.detector.auth.api.dto.LoginMemberResponse
+import com.effective.detector.auth.api.dto.MemberResponse
 import com.effective.detector.common.error.BusinessError
 import com.effective.detector.common.error.BusinessException
 import com.effective.detector.common.util.findByIdOrThrow
+import com.effective.detector.hospital.api.dto.HospitalResponse
+import com.effective.detector.hospital.domain.Hospital
 import com.effective.detector.member.domain.Member
 import com.effective.detector.member.domain.MemberRepository
 import org.springframework.stereotype.Service
@@ -31,11 +34,11 @@ class MemberService(
         memberRepository.save(member)
     }
 
-    fun getMemberMeById(id: Long?, accessToken: String?): MemberMeResponse {
+    fun getLoginMemberById(id: Long?, accessToken: String?): LoginMemberResponse {
         val member = memberRepository.findById(id!!).orElseThrow {
             BusinessException(BusinessError.ID_NOT_FOUND)
         }
-        return MemberMeResponse(
+        return LoginMemberResponse(
             id = member.id,
             name = member.name,
             memberRole = member.memberRole,
@@ -51,5 +54,29 @@ class MemberService(
         if (memberRepository.existsByLoginId(loginId)) {
             throw BusinessException(BusinessError.LOGIN_ID_DUPLICATED)
         }
+    }
+
+    fun getMemberById(id: Long?): MemberResponse? {
+        val member = memberRepository.findById(id!!).orElseThrow {
+            BusinessException(BusinessError.ID_NOT_FOUND)
+        }
+        return MemberResponse(
+            id = member.id,
+            loginId = member.loginId,
+            name = member.name,
+            memberRole = member.memberRole,
+            tel = member.tel,
+            hospital = mapToDto(member.memberHospitals.first().hospital),
+        )
+    }
+
+    fun mapToDto(hospital: Hospital): HospitalResponse {
+        return HospitalResponse(
+            id = hospital.id,
+            name = hospital.name,
+            tel = hospital.tel,
+            type = hospital.type,
+            address = hospital.address,
+        )
     }
 }

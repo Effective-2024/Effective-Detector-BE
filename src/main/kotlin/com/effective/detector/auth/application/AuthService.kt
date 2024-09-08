@@ -2,13 +2,13 @@ package com.effective.detector.auth.application
 
 import com.effective.detector.auth.adapter.AuthenticationAdapter
 import com.effective.detector.auth.api.dto.LoginRequest
-import com.effective.detector.auth.api.dto.MemberMeResponse
+import com.effective.detector.auth.api.dto.LoginMemberResponse
+import com.effective.detector.auth.api.dto.MemberResponse
 import com.effective.detector.auth.api.dto.SignupRequest
 import com.effective.detector.common.error.BusinessError
 import com.effective.detector.common.error.BusinessException
 import com.effective.detector.common.helper.AuthorizationHelper
 import com.effective.detector.hospital.application.HospitalService
-import com.effective.detector.hospital.domain.Hospital
 import com.effective.detector.member.application.MemberService
 import com.effective.detector.member.domain.Member
 import com.effective.detector.member.domain.MemberRole
@@ -51,7 +51,7 @@ class AuthService(
         memberService.save(member)
     }
 
-    fun login(response: HttpServletResponse, loginDto: LoginRequest): MemberMeResponse {
+    fun login(response: HttpServletResponse, loginDto: LoginRequest): LoginMemberResponse {
         val authentication: Authentication
         try {
             authentication = this.getAuthenticationFromIdPassword(
@@ -62,19 +62,19 @@ class AuthService(
         }
         val adapter: AuthenticationAdapter = authentication.principal as AuthenticationAdapter
         val accessToken = cookieService.authenticate(adapter.getId(), adapter.getMemberRole(), response)
-        return memberService.getMemberMeById(adapter.getId(), accessToken)
+        return memberService.getLoginMemberById(adapter.getId(), accessToken)
     }
 
     private fun getAuthenticationFromIdPassword(loginId: String, loginPassword: String): Authentication {
         return authenticationManager.authenticate(UsernamePasswordAuthenticationToken(loginId, loginPassword))
     }
 
-    fun getMemberInfo(response: HttpServletResponse, member: Member): MemberMeResponse? {
+    fun getMemberInfo(response: HttpServletResponse, member: Member): MemberResponse? {
         if (authorizationHelper.getMyRole() != member.memberRole) {
             this.logout(response)
             throw BusinessException(BusinessError.MEMBER_ROLE_NOT_MATCHED)
         }
-        return memberService.getMemberMeById(member.id, null)
+        return memberService.getMemberById(member.id)
     }
 
     fun logout(response: HttpServletResponse) {

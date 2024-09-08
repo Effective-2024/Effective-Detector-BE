@@ -1,7 +1,8 @@
 package com.effective.detector.auth.api
 
 import com.effective.detector.auth.api.dto.LoginRequest
-import com.effective.detector.auth.api.dto.MemberMeResponse
+import com.effective.detector.auth.api.dto.LoginMemberResponse
+import com.effective.detector.auth.api.dto.MemberResponse
 import com.effective.detector.auth.api.dto.SignupRequest
 import com.effective.detector.auth.application.AuthService
 import com.effective.detector.common.annotation.LoginMember
@@ -38,7 +39,7 @@ class AuthController(
     fun login(
         response: HttpServletResponse,
         @RequestBody @Valid loginDto: LoginRequest,
-    ): ResponseEntity<MemberMeResponse> {
+    ): ResponseEntity<LoginMemberResponse> {
         return ResponseEntity.ok(authService.login(response, loginDto))
     }
 
@@ -56,7 +57,7 @@ class AuthController(
     fun getMemberInfo(
         response: HttpServletResponse,
         @LoginMember member: Member,
-    ): ResponseEntity<MemberMeResponse> {
+    ): ResponseEntity<MemberResponse> {
         return ResponseEntity.ok(authService.getMemberInfo(response, member))
     }
 

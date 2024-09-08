@@ -7,7 +7,7 @@ import jakarta.persistence.*
 @Entity
 class Member(
     @Column(unique = true)
-    private var loginId: String? = null,
+    var loginId: String? = null,
 
     @Column(nullable = false)
     var loginPassword: String? = null,
@@ -28,7 +28,7 @@ class Member(
 ) : BaseEntity() {
 
     @OneToMany(mappedBy = "member", cascade = [CascadeType.ALL], orphanRemoval = true)
-    private val memberHospitals: MutableList<MemberHospital> = mutableListOf()
+    val memberHospitals: MutableList<MemberHospital> = mutableListOf()
 
     fun addHospital(hospital: Hospital) {
         val memberHospital = MemberHospital(this, hospital)
