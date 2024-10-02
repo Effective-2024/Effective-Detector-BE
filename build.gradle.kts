@@ -35,7 +35,6 @@ dependencies {
 
     // Websocket
     implementation("org.springframework.boot:spring-boot-starter-websocket")
-    implementation("org.springframework.boot:spring-boot-starter-stomp")
 
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0")
 
