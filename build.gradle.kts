@@ -35,6 +35,7 @@ dependencies {
 
     // Websocket
     implementation("org.springframework.boot:spring-boot-starter-websocket")
+    implementation("org.springframework.boot:spring-boot-starter-stomp")
 
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0")
 
@@ -42,6 +43,17 @@ dependencies {
     implementation("io.jsonwebtoken:jjwt-api:0.11.5")
     runtimeOnly("io.jsonwebtoken:jjwt-impl:0.11.5")
     runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.11.5")
+
+    // RabbitMQ
+    implementation("org.springframework.boot:spring-boot-starter-amqp")
+
+    // Jcodec
+    implementation("org.jcodec:jcodec-javase:0.2.5")
+
+    // S3
+    implementation("com.amazonaws:aws-java-sdk-s3:1.12.520")
+
+    implementation("com.google.code.gson:gson:2.8.9")
 
     developmentOnly("org.springframework.boot:spring-boot-devtools")
     runtimeOnly("com.mysql:mysql-connector-j")

@@ -34,6 +34,9 @@ class Hospital(
 
     @Column(nullable = false)
     private val department: String? = null,
+
+    @OneToMany(mappedBy = "hospital", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
+    val cameras: List<Camera> = mutableListOf(),
 ) : BaseEntity() {
 
     @OneToMany(mappedBy = "hospital", cascade = [CascadeType.ALL], orphanRemoval = true)
