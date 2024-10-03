@@ -24,9 +24,11 @@ class AccidentController(
     @PreAuthorize("permitAll()")
     @GetMapping
     fun getAll(
-        @RequestParam(required = false) pageNumber: Int? = 0,
-        @RequestParam(required = false) pageSize: Int? = 10,
+        @RequestParam(required = false) pageNumber: Int?,
+        @RequestParam(required = false) pageSize: Int?,
     ): ResponseEntity<Page<AccidentResponse>> {
-        return ResponseEntity.ok(accidentService.getAll(PageRequest.of(pageNumber!!, pageSize!!)))
+        val page = pageNumber ?: 0
+        val size = pageSize ?: 10
+        return ResponseEntity.ok(accidentService.getAll(PageRequest.of(page, size)))
     }
 }

@@ -23,11 +23,11 @@ data class AccidentResponse(
                 date = accident.startTime.toLocalDate(),
                 type = AccidentTypeResponse(
                     id = accident.type!!.id,
-                    name = accident.type.name,
+                    name = accident.type.value,
                 ),
                 age = AgeResponse(
                     id = accident.age!!.id,
-                    name = accident.age.name,
+                    name = accident.age.value,
                 ),
             )
         }
