@@ -36,9 +36,10 @@ class WebSocketImageStreamHandler(
         val inputStream: InputStream = ByteArrayInputStream(payload.array())
 
         val queueName = sessionQueueMap[session.id]
-        imageService.sendMessage(inputStream.readBytes(), queueName!!)
+        val readBytes = inputStream.readBytes()
+        imageService.sendMessage(readBytes, queueName!!)
         cameraIdMap[session.id]?.let { cameraId ->
-            sendClientImage(cameraId, inputStream.readBytes())
+            sendClientImage(cameraId, readBytes)
         }
         session.sendMessage(TextMessage("Image Received Successfully."))
     }
@@ -70,7 +71,7 @@ class WebSocketImageStreamHandler(
         messagingTemplate.convertAndSend(
             topicPath,
             ImageMessageDto(
-                endcodedImage = base64EncodedImage
+                encodedImage = base64EncodedImage
             )
         )
     }
@@ -102,5 +103,5 @@ data class AccidentDto(
 )
 
 data class ImageMessageDto(
-    val endcodedImage: String,
+    val encodedImage: String,
 )
