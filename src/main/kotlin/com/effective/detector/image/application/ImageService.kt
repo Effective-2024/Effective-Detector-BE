@@ -159,7 +159,7 @@ class ImageService(
     }
 
     private fun sendVideoMessageToUser() {
-        TODO("Not yet implemented")
+
     }
 
     private fun sendClientMessage(hospitalId: Long, cameraId: Long) {

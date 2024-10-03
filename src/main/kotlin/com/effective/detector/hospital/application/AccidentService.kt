@@ -1,16 +1,19 @@
 package com.effective.detector.hospital.application
 
 import com.effective.detector.hospital.api.dto.AccidentMonthlyResponse
+import com.effective.detector.hospital.api.dto.AccidentResponse
 import com.effective.detector.hospital.api.dto.AccidentYearlyResponse
 import com.effective.detector.hospital.domain.Accident
 import com.effective.detector.hospital.domain.AccidentRepository
 import com.effective.detector.hospital.domain.AccidentType
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 @Service
 @Transactional(readOnly = true)
-class StatisticsService(
+class AccidentService(
     private val accidentRepository: AccidentRepository,
 ) {
 
@@ -48,5 +51,9 @@ class StatisticsService(
                     total = accidentsInYear.size
                 )
             }
+    }
+
+    fun getAll(pageable: Pageable): Page<AccidentResponse> {
+        return accidentRepository.findAll(pageable).map { AccidentResponse.from(it) }
     }
 }

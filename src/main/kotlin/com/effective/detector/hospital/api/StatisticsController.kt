@@ -2,7 +2,7 @@ package com.effective.detector.hospital.api
 
 import com.effective.detector.hospital.api.dto.AccidentMonthlyResponse
 import com.effective.detector.hospital.api.dto.AccidentYearlyResponse
-import com.effective.detector.hospital.application.StatisticsService
+import com.effective.detector.hospital.application.AccidentService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.http.ResponseEntity
@@ -12,11 +12,11 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 
-@Tag(name = "[Hospital Statistics] 병원 통계", description = "병원 통계 관련 기능")
+@Tag(name = "[Statistics] 병원 통계", description = "병원 통계 관련 기능")
 @RestController
 @RequestMapping("/statistics")
 class StatisticsController(
-    private val statisticsService: StatisticsService,
+    private val accidentService: AccidentService,
 ) {
 
     @Operation(summary = "전국사고 건 수 통계 조회(월별)")
@@ -25,13 +25,13 @@ class StatisticsController(
     fun getStatisticsByMonth(
         @RequestParam(required = false) year: Int,
     ): ResponseEntity<List<AccidentMonthlyResponse>> {
-        return ResponseEntity.ok(statisticsService.getStatisticsByMonth(year))
+        return ResponseEntity.ok(accidentService.getStatisticsByMonth(year))
     }
 
     @Operation(summary = "전국사고 건 수 통계 조회(연도별)")
     @PreAuthorize("permitAll()")
     @GetMapping("/year")
     fun getStatisticsByYear(): ResponseEntity<List<AccidentYearlyResponse>> {
-        return ResponseEntity.ok(statisticsService.getStatisticsByYear())
+        return ResponseEntity.ok(accidentService.getStatisticsByYear())
     }
 }
