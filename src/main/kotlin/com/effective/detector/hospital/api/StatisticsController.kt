@@ -34,4 +34,11 @@ class StatisticsController(
     fun getStatisticsByYear(): ResponseEntity<List<AccidentYearlyResponse>> {
         return ResponseEntity.ok(accidentService.getStatisticsByYear())
     }
+
+    @Operation(summary = "통계가 존재하는 연도 목록 조회")
+    @PreAuthorize("permitAll()")
+    @GetMapping("/year")
+    fun getYearByExistAccident(): ResponseEntity<List<Int>> {
+        return ResponseEntity.ok(accidentService.getYearByExistAccident())
+    }
 }

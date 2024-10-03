@@ -62,4 +62,8 @@ class AccidentService(
         return accidentRepository.findAllByHospitalId(hospitalId, pageable)
             .map { AccidentResponse.from(it) }
     }
+
+    fun getYearByExistAccident(): List<Int> {
+        return listOf()
+    }
 }

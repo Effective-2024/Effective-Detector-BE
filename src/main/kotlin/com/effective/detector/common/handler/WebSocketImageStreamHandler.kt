@@ -14,6 +14,7 @@ import org.springframework.web.socket.handler.BinaryWebSocketHandler
 import java.io.ByteArrayInputStream
 import java.io.InputStream
 import java.nio.ByteBuffer
+import java.util.Base64
 
 class WebSocketImageStreamHandler(
     private val rabbitTemplate: RabbitTemplate,
@@ -65,10 +66,11 @@ class WebSocketImageStreamHandler(
         val camera = cameraRepository.findByIdOrThrow(cameraId)
         val topicPath = "/ws/topic/image/hospitals/${camera.hospital.id}/cameras/$cameraId"
         logInfo("Send WebSocket STOMP Message To Path: $topicPath")
+        val base64EncodedImage = Base64.getEncoder().encodeToString(readBytes)
         messagingTemplate.convertAndSend(
             topicPath,
             ImageMessageDto(
-                readBytes
+                endcodedImage = base64EncodedImage
             )
         )
     }
@@ -100,5 +102,5 @@ data class AccidentDto(
 )
 
 data class ImageMessageDto(
-    val bytes: ByteArray,
+    val endcodedImage: String,
 )
