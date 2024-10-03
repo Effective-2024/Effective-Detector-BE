@@ -7,6 +7,7 @@ import com.effective.detector.hospital.api.dto.AccidentMonthlyResponse
 import com.effective.detector.hospital.api.dto.AccidentYearlyResponse
 import com.effective.detector.hospital.api.dto.HospitalResponse
 import com.effective.detector.hospital.application.HospitalService
+import com.effective.detector.hospital.application.ValidateService
 import com.effective.detector.member.domain.Member
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
@@ -23,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController
 @RequestMapping("/hospitals")
 class HospitalController(
     private val hospitalService: HospitalService,
+    private val validateService: ValidateService,
 ) {
 
     @Operation(summary = "병원 검색")
@@ -42,9 +44,7 @@ class HospitalController(
         @RequestParam(required = false) year: Int,
         @LoginMember member: Member,
     ): ResponseEntity<List<AccidentMonthlyResponse>> {
-        if (!member.isMineHospital(hospitalId)) {
-            throw BusinessException(BusinessError.IS_NOT_MY_HOSPITAL)
-        }
+        validateService.checkMemberHospital(member, hospitalId)
         return ResponseEntity.ok(hospitalService.getStatisticsByMonth(hospitalId, year))
     }
 
@@ -55,9 +55,7 @@ class HospitalController(
         @PathVariable hospitalId: Long,
         @LoginMember member: Member,
     ): ResponseEntity<List<AccidentYearlyResponse>> {
-        if (!member.isMineHospital(hospitalId)) {
-            throw BusinessException(BusinessError.IS_NOT_MY_HOSPITAL)
-        }
+        validateService.checkMemberHospital(member, hospitalId)
         return ResponseEntity.ok(hospitalService.getStatisticsByYear(hospitalId))
     }
 }

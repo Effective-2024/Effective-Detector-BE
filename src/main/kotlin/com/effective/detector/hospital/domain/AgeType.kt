@@ -14,4 +14,10 @@ enum class AgeType(
     AGE_80(8, "80대"),
     AGE_NONE(9, "미상"),
     ;
+
+    companion object {
+        fun from(id: Long): AgeType {
+            return entries.first { it.id == id }
+        }
+    }
 }

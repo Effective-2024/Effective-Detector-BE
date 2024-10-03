@@ -19,13 +19,22 @@ class Accident(
 
     @Convert(converter = AccidentTypeConverter::class)
     @Column(nullable = false)
-    val type: AccidentType? = AccidentType.ETC,
+    var type: AccidentType? = AccidentType.ETC,
 
     @Convert(converter = AgeConverter::class)
     @Column(nullable = false)
-    val age: AgeType? = AgeType.AGE_NONE,
+    var age: AgeType? = AgeType.AGE_NONE,
+
+    @Column(nullable = false)
+    var isProcess: Boolean = false,
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "camera_id", nullable = false)
     val camera: Camera,
-) : BaseEntity()
+) : BaseEntity() {
+
+    fun update(accidentType: AccidentType, ageType: AgeType) {
+        this.type = accidentType
+        this.age = ageType
+    }
+}

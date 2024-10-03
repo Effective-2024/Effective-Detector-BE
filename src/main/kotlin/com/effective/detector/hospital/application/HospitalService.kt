@@ -1,12 +1,10 @@
 package com.effective.detector.hospital.application
 
-import com.effective.detector.common.annotation.LoginMember
 import com.effective.detector.common.util.findByIdOrThrow
 import com.effective.detector.hospital.api.dto.AccidentMonthlyResponse
 import com.effective.detector.hospital.api.dto.AccidentYearlyResponse
 import com.effective.detector.hospital.api.dto.HospitalResponse
 import com.effective.detector.hospital.domain.*
-import com.effective.detector.member.domain.Member
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 

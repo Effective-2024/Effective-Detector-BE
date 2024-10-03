@@ -1,10 +1,10 @@
 package com.effective.detector.hospital.api
 
 import com.effective.detector.common.annotation.LoginMember
-import com.effective.detector.common.error.BusinessError
-import com.effective.detector.common.error.BusinessException
+import com.effective.detector.hospital.api.dto.AccidentChangeRequest
 import com.effective.detector.hospital.api.dto.AccidentResponse
 import com.effective.detector.hospital.application.AccidentService
+import com.effective.detector.hospital.application.ValidateService
 import com.effective.detector.member.domain.Member
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
@@ -12,17 +12,14 @@ import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RequestParam
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 
 @Tag(name = "[Accident] 사고", description = "사고 관련 기능")
 @RestController
 @RequestMapping("/accidents")
 class AccidentController(
     private val accidentService: AccidentService,
+    private val validateService: ValidateService,
 ) {
 
     @Operation(summary = "전국 사고 목록 조회")
@@ -48,9 +45,21 @@ class AccidentController(
     ): ResponseEntity<Page<AccidentResponse>> {
         val page = pageNumber ?: 0
         val size = pageSize ?: 10
-        if (!member.isMineHospital(hospitalId)) {
-            throw BusinessException(BusinessError.IS_NOT_MY_HOSPITAL)
-        }
+        validateService.checkMemberHospital(member, hospitalId)
         return ResponseEntity.ok(accidentService.getAllByHospital(hospitalId, PageRequest.of(page, size)))
     }
+
+    @Operation(summary = "사고 정보 수정")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
+    @GetMapping("/{accidentId}")
+    fun update(
+        @PathVariable accidentId: Long,
+        @RequestBody request: AccidentChangeRequest,
+        @LoginMember member: Member,
+    ): ResponseEntity<Void> {
+        validateService.checkMemberHospitalAccident(member, accidentId)
+        accidentService.update(accidentId, request.type, request.age)
+        return ResponseEntity.noContent().build()
+    }
 }
+

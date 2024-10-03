@@ -11,4 +11,10 @@ enum class AccidentType(
     ETC(5, "기타"),
     MALFUNCTION(6, "오작동"),
     ;
+
+    companion object {
+        fun from(id: Long): AccidentType {
+            return entries.first { it.id == id }
+        }
+    }
 }

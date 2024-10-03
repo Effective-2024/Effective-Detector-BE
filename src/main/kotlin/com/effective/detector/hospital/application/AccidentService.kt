@@ -1,13 +1,14 @@
 package com.effective.detector.hospital.application
 
+import com.effective.detector.common.util.findByIdOrThrow
 import com.effective.detector.hospital.api.dto.AccidentMonthlyResponse
 import com.effective.detector.hospital.api.dto.AccidentResponse
 import com.effective.detector.hospital.api.dto.AccidentYearlyResponse
 import com.effective.detector.hospital.domain.Accident
 import com.effective.detector.hospital.domain.AccidentRepository
 import com.effective.detector.hospital.domain.AccidentType
+import com.effective.detector.hospital.domain.AgeType
 import org.springframework.data.domain.Page
-import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -65,5 +66,11 @@ class AccidentService(
 
     fun getYearByExistAccident(): List<Int> {
         return listOf()
+    }
+
+    @Transactional
+    fun update(accidentId: Long, typeId: Long, ageId: Long) {
+        val accident = accidentRepository.findByIdOrThrow(accidentId)
+        accident.update(AccidentType.from(typeId), AgeType.from(ageId))
     }
 }
