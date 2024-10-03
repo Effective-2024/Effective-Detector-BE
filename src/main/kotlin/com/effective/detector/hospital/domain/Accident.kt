@@ -17,7 +17,7 @@ class Accident(
 
     @Convert(converter = AccidentTypeConverter::class)
     @Column(nullable = false)
-    val type: AccidentType? = AccidentType.OTHER,
+    val type: AccidentType? = AccidentType.ETC,
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "camera_id", nullable = false)
