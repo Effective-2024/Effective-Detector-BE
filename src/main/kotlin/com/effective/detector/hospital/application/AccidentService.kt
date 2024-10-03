@@ -7,6 +7,7 @@ import com.effective.detector.hospital.domain.Accident
 import com.effective.detector.hospital.domain.AccidentRepository
 import com.effective.detector.hospital.domain.AccidentType
 import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -55,5 +56,10 @@ class AccidentService(
 
     fun getAll(pageable: Pageable): Page<AccidentResponse> {
         return accidentRepository.findAll(pageable).map { AccidentResponse.from(it) }
+    }
+
+    fun getAllByHospital(hospitalId: Long, pageable: Pageable): Page<AccidentResponse>? {
+        return accidentRepository.findAllByHospitalId(hospitalId, pageable)
+            .map { AccidentResponse.from(it) }
     }
 }

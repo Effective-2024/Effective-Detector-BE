@@ -1,9 +1,13 @@
 package com.effective.detector.hospital.api
 
+import com.effective.detector.common.annotation.LoginMember
+import com.effective.detector.common.error.BusinessError
+import com.effective.detector.common.error.BusinessException
 import com.effective.detector.hospital.api.dto.AccidentMonthlyResponse
 import com.effective.detector.hospital.api.dto.AccidentYearlyResponse
 import com.effective.detector.hospital.api.dto.HospitalResponse
 import com.effective.detector.hospital.application.HospitalService
+import com.effective.detector.member.domain.Member
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.http.ResponseEntity
@@ -36,7 +40,11 @@ class HospitalController(
     fun getStatisticsByMonth(
         @PathVariable hospitalId: Long,
         @RequestParam(required = false) year: Int,
+        @LoginMember member: Member,
     ): ResponseEntity<List<AccidentMonthlyResponse>> {
+        if (!member.isMineHospital(hospitalId)) {
+            throw BusinessException(BusinessError.IS_NOT_MY_HOSPITAL)
+        }
         return ResponseEntity.ok(hospitalService.getStatisticsByMonth(hospitalId, year))
     }
 
@@ -45,7 +53,11 @@ class HospitalController(
     @GetMapping("/{hospitalId}/statistics/year")
     fun getStatisticsByYear(
         @PathVariable hospitalId: Long,
+        @LoginMember member: Member,
     ): ResponseEntity<List<AccidentYearlyResponse>> {
+        if (!member.isMineHospital(hospitalId)) {
+            throw BusinessException(BusinessError.IS_NOT_MY_HOSPITAL)
+        }
         return ResponseEntity.ok(hospitalService.getStatisticsByYear(hospitalId))
     }
 }

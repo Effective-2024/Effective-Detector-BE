@@ -34,4 +34,8 @@ class Member(
         val memberHospital = MemberHospital(this, hospital)
         memberHospitals.add(memberHospital)
     }
+
+    fun isMineHospital(hospitalId: Long): Boolean {
+        return memberHospitals.any { it.hospital.id == hospitalId }
+    }
 }

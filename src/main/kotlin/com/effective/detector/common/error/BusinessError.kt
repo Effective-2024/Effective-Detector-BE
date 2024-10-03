@@ -26,6 +26,7 @@ enum class BusinessError(
     MULTIPLE_ROLE_FOUND(HttpStatus.UNAUTHORIZED, "유저가 두 개 이상의 ROLE을 가지고 있습니다."),
     ROLE_TYPE_ERROR(HttpStatus.UNAUTHORIZED, "해당 유저가 정의되지 않은 ROLE을 가지고 있습니다."),
     LOGIN_ID_DUPLICATED(HttpStatus.CONFLICT, "중복된 아이디 입니다."),
+    IS_NOT_MY_HOSPITAL(HttpStatus.FORBIDDEN, "병원에 대한 권한이 없습니다."),
 
     // RabbitMQ
     RABBITMQ_CONNECTION_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "서버에 문제가 발생했습니다.")
