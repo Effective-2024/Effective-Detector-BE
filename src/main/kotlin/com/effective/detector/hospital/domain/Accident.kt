@@ -1,6 +1,8 @@
 package com.effective.detector.hospital.domain
 
 import com.effective.detector.common.entity.BaseEntity
+import com.effective.detector.hospital.domain.converter.AccidentTypeConverter
+import com.effective.detector.hospital.domain.converter.AgeConverter
 import jakarta.persistence.*
 import java.time.LocalDateTime
 
@@ -18,6 +20,10 @@ class Accident(
     @Convert(converter = AccidentTypeConverter::class)
     @Column(nullable = false)
     val type: AccidentType? = AccidentType.ETC,
+
+    @Convert(converter = AgeConverter::class)
+    @Column(nullable = false)
+    val age: AgeType? = AgeType.AGE_NONE,
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "camera_id", nullable = false)

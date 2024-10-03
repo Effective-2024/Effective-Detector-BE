@@ -2,6 +2,7 @@ package com.effective.detector.hospital.domain
 
 import com.effective.detector.common.entity.BaseEntity
 import com.effective.detector.hospital.domain.HospitalType.HOSPITAL
+import com.effective.detector.hospital.domain.converter.HospitalTypeConverter
 import com.effective.detector.member.domain.MemberHospital
 import jakarta.persistence.*
 

@@ -1,5 +1,6 @@
-package com.effective.detector.hospital.domain
+package com.effective.detector.hospital.domain.converter
 
+import com.effective.detector.hospital.domain.AccidentType
 import jakarta.persistence.AttributeConverter
 import jakarta.persistence.Converter
 
