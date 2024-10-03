@@ -61,5 +61,16 @@ class AccidentController(
         accidentService.update(accidentId, request.type, request.age)
         return ResponseEntity.noContent().build()
     }
+
+    @Operation(summary = "처리되지 않은 사고 정보 조회")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
+    @GetMapping("/hospitals/{hospitalId}/unprocessed")
+    fun getUnprocessAccident(
+        @PathVariable hospitalId: Long,
+        @LoginMember member: Member,
+    ): ResponseEntity<List<AccidentResponse>> {
+        validateService.checkMemberHospital(member, hospitalId)
+        return ResponseEntity.ok(accidentService.getUnprocessAccident(hospitalId))
+    }
 }
 

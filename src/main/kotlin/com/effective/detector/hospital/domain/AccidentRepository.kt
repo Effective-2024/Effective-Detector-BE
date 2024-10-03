@@ -30,4 +30,11 @@ interface AccidentRepository : JpaRepository<Accident, Long> {
         @Param("hospitalId") hospitalId: Long,
         pageable: Pageable,
     ): Page<Accident>
+
+    @Query(
+        "SELECT a FROM Accident a " +
+                "WHERE a.camera.hospital.id = :hospitalId " +
+                "AND a.isProcess = false"
+    )
+    fun findAllByHospitalIdAndUnprocess(@Param("hospitalId") hospitalId: Long): List<Accident>
 }

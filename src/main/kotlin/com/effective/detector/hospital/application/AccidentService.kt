@@ -73,4 +73,8 @@ class AccidentService(
         val accident = accidentRepository.findByIdOrThrow(accidentId)
         accident.update(AccidentType.from(typeId), AgeType.from(ageId))
     }
+
+    fun getUnprocessAccident(hospitalId: Long): List<AccidentResponse> {
+        return accidentRepository.findAllByHospitalIdAndUnprocess(hospitalId).map { AccidentResponse.from(it) }
+    }
 }
