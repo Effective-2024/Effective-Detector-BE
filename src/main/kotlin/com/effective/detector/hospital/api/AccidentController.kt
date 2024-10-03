@@ -51,7 +51,7 @@ class AccidentController(
 
     @Operation(summary = "사고 정보 수정")
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
-    @GetMapping("/{accidentId}")
+    @PatchMapping("/{accidentId}")
     fun update(
         @PathVariable accidentId: Long,
         @RequestBody request: AccidentChangeRequest,
