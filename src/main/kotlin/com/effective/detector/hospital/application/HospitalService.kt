@@ -1,9 +1,10 @@
 package com.effective.detector.hospital.application
 
 import com.effective.detector.common.util.findByIdOrThrow
+import com.effective.detector.hospital.api.dto.AccidentMonthlyResponse
+import com.effective.detector.hospital.api.dto.AccidentYearlyResponse
 import com.effective.detector.hospital.api.dto.HospitalResponse
-import com.effective.detector.hospital.domain.Hospital
-import com.effective.detector.hospital.domain.HospitalRepository
+import com.effective.detector.hospital.domain.*
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -11,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional
 @Transactional(readOnly = true)
 class HospitalService(
     private val hospitalRepository: HospitalRepository,
+    private val accidentRepository: AccidentRepository,
 ) {
 
     fun findHospital(id: Long): Hospital {
@@ -22,5 +24,41 @@ class HospitalService(
             hospitalRepository.findAll().map { HospitalResponse.from(it) }
         else
             hospitalRepository.findByNameContaining(keyword).map { HospitalResponse.from(it) }
+    }
+
+    fun getStatisticsByMonth(hospitalId: Long, year: Int): List<AccidentMonthlyResponse> {
+        val accidents: List<Accident> = accidentRepository.findAllByYearAndHospitalId(year, hospitalId)
+        return accidents.groupBy { it.startTime.month }
+            .map { (month, accidentsInMonth) ->
+                val typeCounts = accidentsInMonth.groupingBy { it.type ?: AccidentType.ETC }.eachCount()
+                AccidentMonthlyResponse(
+                    month = "${month.value}월",
+                    slipping = typeCounts[AccidentType.SLIPPIING] ?: 0,
+                    fighting = typeCounts[AccidentType.FIGHTING] ?: 0,
+                    poorFacilities = typeCounts[AccidentType.POOR_FACILITIES] ?: 0,
+                    carelessness = typeCounts[AccidentType.CARELESSNESS] ?: 0,
+                    malfunction = typeCounts[AccidentType.MALFUNCTION] ?: 0,
+                    etc = typeCounts[AccidentType.ETC] ?: 0,
+                    total = accidentsInMonth.size
+                )
+            }
+    }
+
+    fun getStatisticsByYear(hospitalId: Long): List<AccidentYearlyResponse> {
+        val accidents = accidentRepository.findAllByHospitalId(hospitalId)
+        return accidents.groupBy { it.startTime.year }
+            .map { (year, accidentsInYear) ->
+                val typeCounts = accidentsInYear.groupingBy { it.type ?: AccidentType.ETC }.eachCount()
+                AccidentYearlyResponse(
+                    year = year,
+                    slipping = typeCounts[AccidentType.SLIPPIING] ?: 0,
+                    fighting = typeCounts[AccidentType.FIGHTING] ?: 0,
+                    poorFacilities = typeCounts[AccidentType.POOR_FACILITIES] ?: 0,
+                    carelessness = typeCounts[AccidentType.CARELESSNESS] ?: 0,
+                    malfunction = typeCounts[AccidentType.MALFUNCTION] ?: 0,
+                    etc = typeCounts[AccidentType.ETC] ?: 0,
+                    total = accidentsInYear.size
+                )
+            }
     }
 }
