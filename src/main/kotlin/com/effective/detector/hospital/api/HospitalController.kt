@@ -1,10 +1,7 @@
 package com.effective.detector.hospital.api
 
 import com.effective.detector.common.annotation.LoginMember
-import com.effective.detector.hospital.api.dto.AccidentMonthlyResponse
-import com.effective.detector.hospital.api.dto.AccidentYearlyResponse
-import com.effective.detector.hospital.api.dto.HospitalResponse
-import com.effective.detector.hospital.api.dto.MonitorChangeRequest
+import com.effective.detector.hospital.api.dto.*
 import com.effective.detector.hospital.application.HospitalService
 import com.effective.detector.hospital.application.ValidateService
 import com.effective.detector.member.domain.Member
@@ -53,6 +50,17 @@ class HospitalController(
     ): ResponseEntity<List<AccidentYearlyResponse>> {
         validateService.checkMemberHospital(member, hospitalId)
         return ResponseEntity.ok(hospitalService.getStatisticsByYear(hospitalId))
+    }
+
+    @Operation(summary = "병원에서 모니터링하고 있는 카메라 목록 조회")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
+    @GetMapping("/{hospitalId}/monitors")
+    fun getMonitoringCameras(
+        @PathVariable hospitalId: Long,
+        @LoginMember member: Member,
+    ): ResponseEntity<List<MonitorResponse?>> {
+        validateService.checkMemberHospital(member, hospitalId)
+        return ResponseEntity.ok(hospitalService.getMonitoringCameras(hospitalId))
     }
 
     @Operation(summary = "병원에서 모니터링하고 있는 카메라 변경")
