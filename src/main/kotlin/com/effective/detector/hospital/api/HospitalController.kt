@@ -1,23 +1,19 @@
 package com.effective.detector.hospital.api
 
 import com.effective.detector.common.annotation.LoginMember
-import com.effective.detector.common.error.BusinessError
-import com.effective.detector.common.error.BusinessException
 import com.effective.detector.hospital.api.dto.AccidentMonthlyResponse
 import com.effective.detector.hospital.api.dto.AccidentYearlyResponse
 import com.effective.detector.hospital.api.dto.HospitalResponse
+import com.effective.detector.hospital.api.dto.MonitorChangeRequest
 import com.effective.detector.hospital.application.HospitalService
 import com.effective.detector.hospital.application.ValidateService
 import com.effective.detector.member.domain.Member
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
+import jakarta.validation.Valid
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RequestParam
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 
 @Tag(name = "[Hospital] 병원", description = "병원 관련 기능")
 @RestController
@@ -57,5 +53,18 @@ class HospitalController(
     ): ResponseEntity<List<AccidentYearlyResponse>> {
         validateService.checkMemberHospital(member, hospitalId)
         return ResponseEntity.ok(hospitalService.getStatisticsByYear(hospitalId))
+    }
+
+    @Operation(summary = "병원에서 모니터링하고 있는 카메라 변경")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
+    @PatchMapping("/{hospitalId}/monitors")
+    fun updateMonitoringCamera(
+        @PathVariable hospitalId: Long,
+        @RequestBody @Valid request: MonitorChangeRequest,
+        @LoginMember member: Member,
+    ): ResponseEntity<Void> {
+        validateService.checkMemberHospital(member, hospitalId)
+        hospitalService.updateMonitoringCamera(hospitalId, request.slot, request.cameraId)
+        return ResponseEntity.noContent().build()
     }
 }

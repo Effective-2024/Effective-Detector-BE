@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional
 class HospitalService(
     private val hospitalRepository: HospitalRepository,
     private val accidentRepository: AccidentRepository,
+    private val cameraRepository: CameraRepository,
 ) {
 
     fun findHospital(id: Long): Hospital {
@@ -60,5 +61,14 @@ class HospitalService(
                     total = accidentsInYear.size
                 )
             }
+    }
+
+    @Transactional
+    fun updateMonitoringCamera(hospitalId: Long, slotId: Int, cameraId: Long) {
+        val hospital = hospitalRepository.findByIdOrThrow(hospitalId)
+
+        val slot = hospital.findSlot(slotId)
+        val camera = cameraRepository.findByIdOrThrow(cameraId)
+        slot.change(camera)
     }
 }

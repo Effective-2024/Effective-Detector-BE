@@ -38,6 +38,7 @@ class AuthService(
         memberService.validatedLoginId(request.loginId!!)
         memberService.validatedTel(request.adminTel!!)
         val hospital = hospitalService.findHospital(request.hospitalId!!)
+        hospital.initSlot()
 
         val member = Member(
             loginId = request.loginId,
