@@ -37,4 +37,10 @@ interface AccidentRepository : JpaRepository<Accident, Long> {
                 "AND a.isProcess = false"
     )
     fun findAllByHospitalIdAndUnprocess(@Param("hospitalId") hospitalId: Long): List<Accident>
+
+    @Query("SELECT DISTINCT EXTRACT(YEAR FROM a.startTime) FROM Accident a ORDER BY EXTRACT(YEAR FROM a.startTime) DESC")
+    fun findDistinctYears(): List<Int>
+
+    @Query("SELECT DISTINCT EXTRACT(YEAR FROM a.startTime) FROM Accident a WHERE a.camera.hospital.id = :hospitalId ORDER BY EXTRACT(YEAR FROM a.startTime) DESC")
+    fun findDistinctYearsByHospitalId(hospitalId: Long): List<Int>
 }

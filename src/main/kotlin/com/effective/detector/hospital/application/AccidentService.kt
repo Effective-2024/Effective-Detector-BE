@@ -65,7 +65,7 @@ class AccidentService(
     }
 
     fun getYearByExistAccident(): List<Int> {
-        return listOf()
+        return accidentRepository.findDistinctYears()
     }
 
     @Transactional
@@ -76,5 +76,9 @@ class AccidentService(
 
     fun getUnprocessAccident(hospitalId: Long): List<AccidentResponse> {
         return accidentRepository.findAllByHospitalIdAndUnprocess(hospitalId).map { AccidentResponse.from(it) }
+    }
+
+    fun getYearByExistAccidentHospital(hospitalId: Long): List<Int> {
+        return accidentRepository.findDistinctYearsByHospitalId(hospitalId)
     }
 }

@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
@@ -40,5 +41,14 @@ class StatisticsController(
     @GetMapping("/exist/years")
     fun getYearByExistAccident(): ResponseEntity<List<Int>> {
         return ResponseEntity.ok(accidentService.getYearByExistAccident())
+    }
+
+    @Operation(summary = "통계가 존재하는 연도 목록 조회")
+    @PreAuthorize("permitAll()")
+    @GetMapping("/exist/years/hospital/{hospitalId}")
+    fun getYearByExistAccidentHospital(
+        @PathVariable hospitalId: Long,
+    ): ResponseEntity<List<Int>> {
+        return ResponseEntity.ok(accidentService.getYearByExistAccidentHospital(hospitalId))
     }
 }
