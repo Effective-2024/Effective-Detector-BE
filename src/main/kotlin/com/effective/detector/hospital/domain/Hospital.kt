@@ -46,8 +46,7 @@ class Hospital(
 ) : BaseEntity() {
 
     @OneToMany(mappedBy = "hospital", cascade = [CascadeType.ALL], orphanRemoval = true)
-    private val memberHospitals: MutableList<MemberHospital> = mutableListOf()
-
+    val memberHospitals: MutableList<MemberHospital> = mutableListOf()
 
     fun initSlot() {
         slots.add(Slot(0, this))

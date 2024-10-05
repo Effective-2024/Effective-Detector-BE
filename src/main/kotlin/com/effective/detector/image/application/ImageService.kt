@@ -7,12 +7,11 @@ import com.effective.detector.common.error.BusinessException
 import com.effective.detector.common.util.findByIdOrThrow
 import com.effective.detector.common.util.logError
 import com.effective.detector.common.util.logInfo
-import com.effective.detector.hospital.domain.Accident
-import com.effective.detector.hospital.domain.AccidentRepository
-import com.effective.detector.hospital.domain.CameraRepository
-import com.effective.detector.hospital.domain.HospitalRepository
+import com.effective.detector.hospital.domain.*
 import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonProperty
+import net.minidev.json.JSONObject
+import net.nurigo.java_sdk.exceptions.CoolsmsException
 import org.jcodec.api.SequenceEncoder
 import org.jcodec.common.io.NIOUtils
 import org.jcodec.common.model.ColorSpace
@@ -31,6 +30,7 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import javax.imageio.ImageIO
 
+
 @Service
 class ImageService(
     private val rabbitTemplate: RabbitTemplate,
@@ -39,6 +39,7 @@ class ImageService(
     private val cameraRepository: CameraRepository,
     private val accidentRepository: AccidentRepository,
     private val messagingTemplate: SimpMessagingTemplate,
+    private val coolSmsSender: net.nurigo.java_sdk.api.Message,
 ) {
 
     companion object {
@@ -47,6 +48,12 @@ class ImageService(
 
     @Value("\${rabbitmq.ttl}")
     private val ttl: String? = null
+
+    @Value("\${video-prefix}")
+    private val videoPrefix: String? = null
+
+    @Value("\${coolsms.sender-number}")
+    private val senderNumber: String? = null
 
     fun sendMessage(byteArray: ByteArray, queueName: String) {
         logInfo("send to rabbitMq image file")
@@ -64,8 +71,9 @@ class ImageService(
     fun accident(queueName: String, hospitalId: Long, cameraId: Long) {
         try {
             val timeInfo = convertImageToVideo(queueName) ?: return // 30초 내의 이미지들을 영상으로 변환
-            uploadToStorage(hospitalId, cameraId, timeInfo) // 영상을 S3에 저장하고 DB 테이블에 정보들 저장.
-            sendVideoMessageToUser() // TODO: 사고 발생 영상을 문자로 전송.
+            val camera = cameraRepository.findByIdOrThrow(cameraId)
+            val videoUrl = uploadToStorage(hospitalId, camera, timeInfo) // 영상을 S3에 저장하고 DB 테이블에 정보들 저장.
+            sendVideoMessageToUser(hospitalId, camera, videoUrl) // 사고 발생 영상을 문자로 전송.
             sendClientMessage(hospitalId, cameraId) // 클라이언트로 사고 발생 알림 보내기
         } catch (exception: Exception) {
             logError("RabbitMqMessage Handling Error", exception)
@@ -117,10 +125,15 @@ class ImageService(
         return AWTUtil.fromBufferedImage(image, ColorSpace.RGB)
     }
 
-    private fun uploadToStorage(hospitalId: Long, cameraId: Long, timeInfo: Pair<LocalDateTime?, LocalDateTime?>) {
-        val videoUrl = "$hospitalId-$cameraId-${LocalDateTime.now()}.mp4"
+    private fun uploadToStorage(
+        hospitalId: Long,
+        camera: Camera,
+        timeInfo: Pair<LocalDateTime?, LocalDateTime?>,
+    ): String {
+        val videoUrl = "$hospitalId-$camera-${LocalDateTime.now()}.mp4"
         uploadVideo(videoUrl)
-        saveVideoInfo(videoUrl, hospitalId, cameraId, timeInfo.first!!, timeInfo.second!!)
+        saveVideoInfo(videoUrl, hospitalId, camera, timeInfo.first!!, timeInfo.second!!)
+        return videoPrefix + videoUrl
     }
 
     private fun uploadVideo(videoUrl: String) {
@@ -142,12 +155,11 @@ class ImageService(
     private fun saveVideoInfo(
         videoUrl: String,
         hospitalId: Long,
-        cameraId: Long,
+        camera: Camera,
         startTime: LocalDateTime,
         endTime: LocalDateTime,
     ) {
-        val hospital = hospitalRepository.findByIdOrThrow(hospitalId)
-        val camera = cameraRepository.findByIdOrThrow(cameraId)
+        hospitalRepository.findByIdOrThrow(hospitalId) // 존재하는 병원인지 유효성 체크.
         accidentRepository.save(
             Accident(
                 videoUrl = videoUrl,
@@ -158,8 +170,24 @@ class ImageService(
         )
     }
 
-    private fun sendVideoMessageToUser() {
+    private fun sendVideoMessageToUser(hospitalId: Long, camera: Camera, videoUrl: String) {
+        val hospital = hospitalRepository.findByIdOrThrow(hospitalId)
 
+        val params = HashMap<String, String>()
+        hospital.memberHospitals.map { it.member }.forEach {
+            params["to"] = senderNumber!!
+            params["from"] = it.tel!!
+            params["type"] = "SMS"
+            params["text"] = "${hospital.name}병원의 ${camera.name}번 카메라에서 낙상사고가 감지되었습니다. 영상을 확인해주세요. 영상 링크 : $videoUrl"
+            params["app_version"] = "test app 1.2"
+
+            try {
+                val obj: JSONObject = coolSmsSender.send(params) as JSONObject
+                logInfo(obj.toString())
+            } catch (e: CoolsmsException) {
+                logError(e.message, e)
+            }
+        }
     }
 
     private fun sendClientMessage(hospitalId: Long, cameraId: Long) {
