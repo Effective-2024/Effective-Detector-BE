@@ -4,7 +4,7 @@ import com.effective.detector.common.util.findByIdOrThrow
 import com.effective.detector.hospital.api.dto.AccidentMonthlyResponse
 import com.effective.detector.hospital.api.dto.AccidentYearlyResponse
 import com.effective.detector.hospital.api.dto.HospitalResponse
-import com.effective.detector.hospital.api.dto.MonitorResponse
+import com.effective.detector.hospital.api.dto.CameraResponse
 import com.effective.detector.hospital.domain.*
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -73,8 +73,13 @@ class HospitalService(
         slot.change(camera)
     }
 
-    fun getMonitoringCameras(hospitalId: Long): List<MonitorResponse?> {
+    fun getMonitoringCameras(hospitalId: Long): List<CameraResponse?> {
         val hospital = hospitalRepository.findByIdOrThrow(hospitalId)
-        return hospital.slots.map { MonitorResponse.from(it.camera) }
+        return hospital.slots.map { CameraResponse.from(it.camera) }
+    }
+
+    fun getAllCameras(hospitalId: Long): List<CameraResponse> {
+        val hospital = hospitalRepository.findByIdOrThrow(hospitalId)
+        return hospital.cameras.map { CameraResponse.toDto(it) }
     }
 }

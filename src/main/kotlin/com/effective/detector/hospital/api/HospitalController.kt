@@ -52,13 +52,24 @@ class HospitalController(
         return ResponseEntity.ok(hospitalService.getStatisticsByYear(hospitalId))
     }
 
+    @Operation(summary = "병원에 설치된 카메라 목록 조회")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
+    @GetMapping("/{hospitalId}/cameras")
+    fun getAllCameras(
+        @PathVariable hospitalId: Long,
+        @LoginMember member: Member,
+    ): ResponseEntity<List<CameraResponse?>> {
+        validateService.checkMemberHospital(member, hospitalId)
+        return ResponseEntity.ok(hospitalService.getAllCameras(hospitalId))
+    }
+
     @Operation(summary = "병원에서 모니터링하고 있는 카메라 목록 조회")
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
     @GetMapping("/{hospitalId}/monitors")
     fun getMonitoringCameras(
         @PathVariable hospitalId: Long,
         @LoginMember member: Member,
-    ): ResponseEntity<List<MonitorResponse?>> {
+    ): ResponseEntity<List<CameraResponse?>> {
         validateService.checkMemberHospital(member, hospitalId)
         return ResponseEntity.ok(hospitalService.getMonitoringCameras(hospitalId))
     }
