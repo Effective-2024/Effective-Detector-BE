@@ -109,7 +109,7 @@ class ImageService(
 
     private fun createMp4(imageList: List<ByteArray>, outputFilePath: String) {
         val out = NIOUtils.writableFileChannel(outputFilePath)
-        val encoder = SequenceEncoder.createWithFps(out, Rational.R(30, 1))  // FPS 설정
+        val encoder = SequenceEncoder.createWithFps(out, Rational.R(10, 1))  // FPS 설정
 
         for (imageBytes in imageList) {
             val img = ImageIO.read(ByteArrayInputStream(imageBytes))
