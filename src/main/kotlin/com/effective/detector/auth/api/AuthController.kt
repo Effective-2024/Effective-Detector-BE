@@ -33,6 +33,14 @@ class AuthController(
         return ResponseEntity.ok().build()
     }
 
+    @Operation(summary = "회원 탈퇴")
+    @PreAuthorize("isAuthenticated()")
+    @PostMapping("/signout")
+    fun signOut(@LoginMember member: Member): ResponseEntity<Void> {
+        authService.signOut(member)
+        return ResponseEntity.noContent().build()
+    }
+
     @Operation(summary = "로그인")
     @PreAuthorize("permitAll()")
     @PostMapping("/login")

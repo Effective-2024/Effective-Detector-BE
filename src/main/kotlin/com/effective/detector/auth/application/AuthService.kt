@@ -11,6 +11,7 @@ import com.effective.detector.common.helper.AuthorizationHelper
 import com.effective.detector.hospital.application.HospitalService
 import com.effective.detector.member.application.MemberService
 import com.effective.detector.member.domain.Member
+import com.effective.detector.member.domain.MemberRepository
 import com.effective.detector.member.domain.MemberRole
 import com.effective.detector.member.domain.MemberStatus
 import jakarta.servlet.http.HttpServletResponse
@@ -31,6 +32,7 @@ class AuthService(
     private val authenticationManager: AuthenticationManager,
     private val cookieService: CookieService,
     private val authorizationHelper: AuthorizationHelper,
+    private val memberRepository: MemberRepository,
 ) {
 
     @Transactional
@@ -80,5 +82,10 @@ class AuthService(
 
     fun logout(response: HttpServletResponse) {
         response.addCookie(cookieService.deleteAccessTokenCookie())
+    }
+
+    @Transactional
+    fun signOut(member: Member) {
+        memberRepository.delete(member)
     }
 }
