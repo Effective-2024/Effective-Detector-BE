@@ -1,9 +1,7 @@
 package com.effective.detector.hospital.application
 
 import com.effective.detector.common.util.findByIdOrThrow
-import com.effective.detector.hospital.api.dto.response.AccidentMonthlyResponse
-import com.effective.detector.hospital.api.dto.response.AccidentResponse
-import com.effective.detector.hospital.api.dto.response.AccidentYearlyResponse
+import com.effective.detector.hospital.api.dto.response.*
 import com.effective.detector.hospital.domain.Accident
 import com.effective.detector.hospital.domain.AccidentRepository
 import com.effective.detector.hospital.domain.AccidentType
@@ -12,6 +10,7 @@ import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.time.LocalDate
 
 @Service
 @Transactional(readOnly = true)
@@ -80,5 +79,86 @@ class AccidentService(
 
     fun getYearByExistAccidentHospital(hospitalId: Long): List<Int> {
         return accidentRepository.findDistinctYearsByHospitalId(hospitalId)
+    }
+
+    fun getPerformance(): AllPerformanceStatisticResponse {
+        val currentYear = LocalDate.now().year
+        val lastYear = currentYear.dec()
+        val totalAccidentCount = accidentRepository.getTotalAccidentCountForYear(currentYear)
+        val lastYearAccidentCount = accidentRepository.getTotalAccidentCountForYear(lastYear)
+
+        val primaryReason =
+            accidentRepository.getPrimaryReasonForAccidents(currentYear) ?: PrimaryReasonResponse(0, "미상")
+
+        val increaseRateByLastYear = if (lastYearAccidentCount != 0L) {
+            ((totalAccidentCount - lastYearAccidentCount).toDouble() / lastYearAccidentCount) * 100
+        } else {
+            100.0 // 전년도 사고가 없을 경우 100% 증가로 간주
+        }
+
+        val malfunctionAccidentCount = accidentRepository.getMalfunctionAccidentCount(currentYear)
+        val detectionAccuracy = if (totalAccidentCount > 0) {
+            (malfunctionAccidentCount.toDouble() / totalAccidentCount) * 100
+        } else {
+            0.0
+        }
+
+        val mostAccidentsData = accidentRepository.getMostAccidentsOccurredByMonthAndYear(currentYear)
+        val mostAccidentsOrccuredMonth = (mostAccidentsData.firstOrNull()?.get(1) ?: 1)
+        val mostAccidentsOrccuredYear = (mostAccidentsData.firstOrNull()?.get(0) ?: currentYear)
+
+        return AllPerformanceStatisticResponse(
+            totalAccidentCount = totalAccidentCount,
+            primaryReason = primaryReason,
+            increaseRateByLastYear = increaseRateByLastYear,
+            detectionAccuracy = detectionAccuracy,
+            mostAccidentsOrccuredMonth = mostAccidentsOrccuredMonth,
+            mostAccidentsOrccuredYear = mostAccidentsOrccuredYear
+        )
+    }
+
+    fun getPerformanceByHospital(hospitalId: Long): HospitalPerformanceStatisticResponse {
+        val currentYear = LocalDate.now().year
+        val lastYear = currentYear.dec()
+        val totalAccidentCount = accidentRepository.getTotalAccidentCountByHospitalId(hospitalId, currentYear)
+        val lastYearAccidentCount = accidentRepository.getTotalAccidentCountByHospitalId(hospitalId, lastYear)
+
+        val primaryReason =
+            accidentRepository.getPrimaryReasonForAccidentsByHospitalId(hospitalId, currentYear)
+                ?: PrimaryReasonResponse(0, "미상")
+
+        val increaseRateByLastYear = if (lastYearAccidentCount != 0L) {
+            ((totalAccidentCount - lastYearAccidentCount).toDouble() / lastYearAccidentCount) * 100
+        } else {
+            100.0 // 전년도 사고가 없을 경우 100% 증가로 간주
+        }
+
+        val malfunctionAccidentCount =
+            accidentRepository.getMalfunctionAccidentCountByHospitalId(hospitalId, currentYear)
+        val detectionAccuracy = if (totalAccidentCount > 0) {
+            (malfunctionAccidentCount.toDouble() / totalAccidentCount) * 100
+        } else {
+            0.0
+        }
+
+        val mostAccidentsData =
+            accidentRepository.getMostAccidentsOccurredByMonthAndYearByHospitalId(hospitalId, currentYear)
+        val mostAccidentsOrccuredMonth = (mostAccidentsData.firstOrNull()?.get(1) ?: 1) as Int
+
+        val allAccidentCount = accidentRepository.getTotalAccidentCountForYear(currentYear)
+        val increaseRateByAverage = if (allAccidentCount > 0) {
+            (totalAccidentCount.toDouble() / allAccidentCount) * 100
+        } else {
+            0.0
+        }
+
+        return HospitalPerformanceStatisticResponse(
+            totalAccidentCount = totalAccidentCount,
+            primaryReason = primaryReason,
+            increaseRateByLastYear = increaseRateByLastYear,
+            detectionAccuracy = detectionAccuracy,
+            mostAccidentsOrccuredMonth = mostAccidentsOrccuredMonth,
+            increaseRateByAverage = increaseRateByAverage,
+        )
     }
 }
