@@ -1,7 +1,7 @@
-package com.effective.detector.hospital.api.dto
+package com.effective.detector.hospital.api.dto.response
 
-data class AccidentYearlyResponse(
-    val year: Int,
+data class AccidentMonthlyResponse(
+    val month: String,
     val slipping: Int,
     val fighting: Int,
     val poorFacilities: Int,

@@ -45,7 +45,7 @@ class Hospital(
     val slots: MutableList<Slot> = mutableListOf(),
 ) : BaseEntity() {
 
-    @OneToMany(mappedBy = "hospital", cascade = [CascadeType.ALL], orphanRemoval = true)
+    @OneToMany(mappedBy = "hospital", fetch = FetchType.EAGER, cascade = [CascadeType.ALL], orphanRemoval = true)
     val memberHospitals: MutableList<MemberHospital> = mutableListOf()
 
     fun initSlot() {

@@ -1,7 +1,11 @@
 package com.effective.detector.hospital.api
 
 import com.effective.detector.common.annotation.LoginMember
-import com.effective.detector.hospital.api.dto.*
+import com.effective.detector.hospital.api.dto.request.MonitorChangeRequest
+import com.effective.detector.hospital.api.dto.response.AccidentMonthlyResponse
+import com.effective.detector.hospital.api.dto.response.AccidentYearlyResponse
+import com.effective.detector.hospital.api.dto.response.CameraResponse
+import com.effective.detector.hospital.api.dto.response.HospitalResponse
 import com.effective.detector.hospital.application.HospitalService
 import com.effective.detector.hospital.application.ValidateService
 import com.effective.detector.member.domain.Member

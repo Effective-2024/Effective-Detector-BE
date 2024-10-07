@@ -10,7 +10,6 @@ import com.effective.detector.common.util.logInfo
 import com.effective.detector.hospital.domain.*
 import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonProperty
-import net.minidev.json.JSONObject
 import net.nurigo.java_sdk.exceptions.CoolsmsException
 import org.jcodec.api.SequenceEncoder
 import org.jcodec.common.io.NIOUtils
@@ -73,8 +72,8 @@ class ImageService(
             val timeInfo = convertImageToVideo(queueName) ?: return // 30초 내의 이미지들을 영상으로 변환
             val camera = cameraRepository.findByIdOrThrow(cameraId)
             val videoUrl = uploadToStorage(hospitalId, camera, timeInfo) // 영상을 S3에 저장하고 DB 테이블에 정보들 저장.
-            sendVideoMessageToUser(hospitalId, camera, videoUrl) // 사고 발생 영상을 문자로 전송.
-            sendClientMessage(hospitalId, cameraId) // 클라이언트로 사고 발생 알림 보내기
+            //sendVideoMessageToUser(hospitalId, camera, videoUrl) // 사고 발생 영상을 문자로 전송. TODO: 시연시 활성화.
+            sendClientMessage(hospitalId, camera) // 클라이언트로 사고 발생 알림 보내기
         } catch (exception: Exception) {
             logError("RabbitMqMessage Handling Error", exception)
         }
@@ -130,7 +129,7 @@ class ImageService(
         camera: Camera,
         timeInfo: Pair<LocalDateTime?, LocalDateTime?>,
     ): String {
-        val videoUrl = "$hospitalId-$camera-${LocalDateTime.now()}.mp4"
+        val videoUrl = "$hospitalId-${camera.id}-${LocalDateTime.now()}.mp4"
         uploadVideo(videoUrl)
         saveVideoInfo(videoUrl, hospitalId, camera, timeInfo.first!!, timeInfo.second!!)
         return videoPrefix + videoUrl
@@ -177,27 +176,30 @@ class ImageService(
         hospital.memberHospitals.map { it.member }.forEach {
             params["to"] = senderNumber!!
             params["from"] = it.tel!!
-            params["type"] = "SMS"
+            params["type"] = "LMS"
             params["text"] = "${hospital.name}병원의 ${camera.name}번 카메라에서 낙상사고가 감지되었습니다. 영상을 확인해주세요. 영상 링크 : $videoUrl"
             params["app_version"] = "test app 1.2"
 
             try {
-                val obj: JSONObject = coolSmsSender.send(params) as JSONObject
-                logInfo(obj.toString())
+                coolSmsSender.send(params)
+                logInfo("SMS Sent Successfully To ${it.tel}")
             } catch (e: CoolsmsException) {
                 logError(e.message, e)
             }
         }
     }
 
-    private fun sendClientMessage(hospitalId: Long, cameraId: Long) {
-        val topicPath = "/ws/topic/accident/hospitals/$hospitalId/cameras/$cameraId"
+    private fun sendClientMessage(hospitalId: Long, camera: Camera) {
+        val topicPath = "/ws/topic/accident/hospitals/$hospitalId"
         logInfo("Send WebSocket STOMP Message To Path: $topicPath")
         messagingTemplate.convertAndSend(
             topicPath,
             AccidentMessageDto(
                 hospitalId = hospitalId,
-                cameraId = cameraId,
+                camera = CameraMessageDto(
+                    id = camera.id!!,
+                    content = camera.name
+                ),
                 startTime = LocalDateTime.now(),
                 endTime = LocalDateTime.now()
             )
@@ -212,7 +214,12 @@ data class ImageMessageDto @JsonCreator constructor(
 
 data class AccidentMessageDto @JsonCreator constructor(
     @JsonProperty("hospitalId") val hospitalId: Long,
-    @JsonProperty("cameraId") val cameraId: Long,
+    @JsonProperty("camera") val camera: CameraMessageDto,
     @JsonProperty("startTime") val startTime: LocalDateTime,
     @JsonProperty("endTime") val endTime: LocalDateTime,
+)
+
+data class CameraMessageDto @JsonCreator constructor(
+    @JsonProperty("id") val id: Long,
+    @JsonProperty("content") val content: String,
 )

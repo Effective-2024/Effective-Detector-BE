@@ -1,6 +1,6 @@
 package com.effective.detector.auth.api.dto
 
-import com.effective.detector.hospital.api.dto.HospitalResponse
+import com.effective.detector.hospital.api.dto.response.HospitalResponse
 import com.effective.detector.member.domain.MemberRole
 
 data class MemberResponse(

@@ -1,9 +1,9 @@
 package com.effective.detector.hospital.application
 
 import com.effective.detector.common.util.findByIdOrThrow
-import com.effective.detector.hospital.api.dto.AccidentMonthlyResponse
-import com.effective.detector.hospital.api.dto.AccidentResponse
-import com.effective.detector.hospital.api.dto.AccidentYearlyResponse
+import com.effective.detector.hospital.api.dto.response.AccidentMonthlyResponse
+import com.effective.detector.hospital.api.dto.response.AccidentResponse
+import com.effective.detector.hospital.api.dto.response.AccidentYearlyResponse
 import com.effective.detector.hospital.domain.Accident
 import com.effective.detector.hospital.domain.AccidentRepository
 import com.effective.detector.hospital.domain.AccidentType

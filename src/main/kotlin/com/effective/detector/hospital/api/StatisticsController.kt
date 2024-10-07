@@ -1,7 +1,7 @@
 package com.effective.detector.hospital.api
 
-import com.effective.detector.hospital.api.dto.AccidentMonthlyResponse
-import com.effective.detector.hospital.api.dto.AccidentYearlyResponse
+import com.effective.detector.hospital.api.dto.response.AccidentMonthlyResponse
+import com.effective.detector.hospital.api.dto.response.AccidentYearlyResponse
 import com.effective.detector.hospital.application.AccidentService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag

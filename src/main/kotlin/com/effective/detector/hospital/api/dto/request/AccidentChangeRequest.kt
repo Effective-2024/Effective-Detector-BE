@@ -1,4 +1,4 @@
-package com.effective.detector.hospital.api.dto
+package com.effective.detector.hospital.api.dto.request
 
 data class AccidentChangeRequest(
     val type: Long,

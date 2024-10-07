@@ -5,7 +5,7 @@ import com.effective.detector.auth.api.dto.MemberResponse
 import com.effective.detector.common.error.BusinessError
 import com.effective.detector.common.error.BusinessException
 import com.effective.detector.common.util.findByIdOrThrow
-import com.effective.detector.hospital.api.dto.HospitalResponse
+import com.effective.detector.hospital.api.dto.response.HospitalResponse
 import com.effective.detector.hospital.domain.Hospital
 import com.effective.detector.member.domain.Member
 import com.effective.detector.member.domain.MemberRepository

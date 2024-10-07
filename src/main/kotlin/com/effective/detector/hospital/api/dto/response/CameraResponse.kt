@@ -1,4 +1,4 @@
-package com.effective.detector.hospital.api.dto
+package com.effective.detector.hospital.api.dto.response
 
 import com.effective.detector.hospital.domain.Camera
 
