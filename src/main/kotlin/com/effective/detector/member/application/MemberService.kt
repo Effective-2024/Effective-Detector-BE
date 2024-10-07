@@ -43,6 +43,7 @@ class MemberService(
             name = member.name,
             memberRole = member.memberRole,
             accessToken = accessToken,
+            hospitalId = member.memberHospitals.map { it.hospital.id!! },
         )
     }
 
