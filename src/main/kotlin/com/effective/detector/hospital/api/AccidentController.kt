@@ -72,5 +72,16 @@ class AccidentController(
         validateService.checkMemberHospital(member, hospitalId)
         return ResponseEntity.ok(accidentService.getUnprocessAccident(hospitalId))
     }
+
+    @Operation(summary = "사고 처리")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
+    @PatchMapping("/{hospitalId}/process")
+    fun processAccident(
+        @PathVariable hospitalId: Long,
+        @LoginMember member: Member,
+    ): ResponseEntity<List<AccidentResponse>> {
+        validateService.checkMemberHospital(member, hospitalId)
+        return ResponseEntity.ok(accidentService.getUnprocessAccident(hospitalId))
+    }
 }
 

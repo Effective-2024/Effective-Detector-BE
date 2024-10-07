@@ -22,30 +22,21 @@ class JwtAuthorizationFilter(
         request: HttpServletRequest, @NonNull response: HttpServletResponse,
         @NonNull filterChain: FilterChain,
     ) {
-        // 쿠키에서 토큰 파싱
-        var token: String? = null
-        val cookies = request.cookies
-        if (cookies != null) {
-            for (cookie in cookies) {
-                if (cookie.name == "access_token") {
-                    token = cookie.value
-                    break
+        request.getHeaders("Authorization").toList().forEach {
+            if (it.startsWith("Bearer ")) {
+                val token = it.substring(7)
+                try {
+                    val claims: Claims = jwtService.extractClaims(token)
+                    val id = claims.subject
+                    val role = claims["role"] as String?
+                    val authenticationToken = UsernamePasswordAuthenticationToken(
+                        id, null, listOf(SimpleGrantedAuthority(role))
+                    )
+                    SecurityContextHolder.getContext().authentication = authenticationToken
+                } catch (e: RuntimeException) {
+                    logWarn(e.message, e)
                 }
             }
-        }
-
-        try { // 토큰 있을 때 인증 수행
-            if (token != null) {
-                val claims: Claims = jwtService.extractClaims(token)
-                val id = claims.subject
-                val role = claims["role"] as String?
-                val authenticationToken = UsernamePasswordAuthenticationToken(
-                    id, null, listOf(SimpleGrantedAuthority(role))
-                )
-                SecurityContextHolder.getContext().authentication = authenticationToken
-            }
-        } catch (e: RuntimeException) {
-            logWarn(e.message, e)
         }
 
         // 필터 체인을 통해 요청과 응답을 전달
