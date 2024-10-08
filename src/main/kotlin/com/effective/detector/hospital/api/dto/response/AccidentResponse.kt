@@ -1,6 +1,8 @@
 package com.effective.detector.hospital.api.dto.response
 
 import com.effective.detector.hospital.domain.Accident
+import com.effective.detector.hospital.domain.AccidentType
+import com.effective.detector.hospital.domain.AgeType
 import java.time.LocalDate
 import java.time.LocalDateTime
 
@@ -10,7 +12,7 @@ data class AccidentResponse(
     val startTime: LocalDateTime,
     val endTime: LocalDateTime,
     val date: LocalDate,
-    val type: AccidentTypeResponse,
+    val type: TypeResponse,
     val age: AgeResponse,
 ) {
     companion object {
@@ -21,7 +23,7 @@ data class AccidentResponse(
                 startTime = accident.startTime,
                 endTime = accident.endTime,
                 date = accident.startTime.toLocalDate(),
-                type = AccidentTypeResponse(
+                type = TypeResponse(
                     id = accident.type!!.id,
                     name = accident.type!!.value,
                 ),
@@ -34,12 +36,30 @@ data class AccidentResponse(
     }
 }
 
-data class AccidentTypeResponse(
+data class TypeResponse(
     val id: Long,
     val name: String,
-)
+) {
+    companion object {
+        fun from(type: AccidentType): TypeResponse {
+            return TypeResponse(
+                id = type.id,
+                name = type.value,
+            )
+        }
+    }
+}
 
 data class AgeResponse(
     val id: Long,
     val name: String,
-)
+) {
+    companion object {
+        fun from(type: AgeType): AgeResponse {
+            return AgeResponse(
+                id = type.id,
+                name = type.value,
+            )
+        }
+    }
+}

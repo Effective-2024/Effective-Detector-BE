@@ -166,4 +166,12 @@ class AccidentService(
         val accident = accidentRepository.findByIdOrThrow(accidentId)
         accident.process()
     }
+
+    fun getAges(): List<AgeResponse> {
+        return AgeType.entries.map { AgeResponse.from(it) }
+    }
+
+    fun getTypes(): List<TypeResponse> {
+        return AccidentType.entries.map { TypeResponse.from(it) }
+    }
 }
