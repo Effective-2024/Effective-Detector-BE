@@ -67,8 +67,12 @@ class HospitalService(
     @Transactional
     fun updateMonitoringCamera(hospitalId: Long, slotId: Int, cameraId: Long) {
         val hospital = hospitalRepository.findByIdOrThrow(hospitalId)
-
         val slot = hospital.findSlot(slotId)
+
+        if (cameraId == -1L) {
+            slot.remove()
+            return
+        }
         val camera = cameraRepository.findByIdOrThrow(cameraId)
         slot.change(camera)
     }

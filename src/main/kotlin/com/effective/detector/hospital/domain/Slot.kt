@@ -21,4 +21,8 @@ class Slot(
         this.camera = camera
         camera.slot = this
     }
+
+    fun remove() {
+        this.camera = null
+    }
 }
