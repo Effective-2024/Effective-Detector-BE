@@ -161,4 +161,9 @@ class AccidentService(
             increaseRateByAverage = increaseRateByAverage,
         )
     }
+
+    fun processAccident(accidentId: Long) {
+        val accident = accidentRepository.findByIdOrThrow(accidentId)
+        accident.process()
+    }
 }

@@ -3,6 +3,7 @@ package com.effective.detector.hospital.application
 import com.effective.detector.common.error.BusinessError
 import com.effective.detector.common.error.BusinessException
 import com.effective.detector.common.util.findByIdOrThrow
+import com.effective.detector.hospital.domain.Accident
 import com.effective.detector.hospital.domain.AccidentRepository
 import com.effective.detector.member.domain.Member
 import org.springframework.stereotype.Service
@@ -22,8 +23,6 @@ class ValidateService(
 
     fun checkMemberHospitalAccident(member: Member, accidentId: Long) {
         val accident = accidentRepository.findByIdOrThrow(accidentId)
-        if (!member.isMineHospital(accident.camera.hospital.id!!)) {
-            throw BusinessException(BusinessError.IS_NOT_MY_HOSPITAL)
-        }
+        member.isMineHospital(accident.camera.hospital.id!!)
     }
 }

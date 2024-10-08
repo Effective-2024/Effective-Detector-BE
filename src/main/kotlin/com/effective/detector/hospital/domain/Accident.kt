@@ -37,4 +37,8 @@ class Accident(
         this.type = accidentType
         this.age = ageType
     }
+
+    fun process() {
+        this.isProcess = true
+    }
 }
