@@ -110,6 +110,7 @@ class AccidentService(
     fun update(accidentId: Long, typeId: Long, ageId: Long) {
         val accident = accidentRepository.findByIdOrThrow(accidentId)
         accident.update(AccidentType.from(typeId), AgeType.from(ageId))
+        accident.process()
     }
 
     fun getUnprocessAccident(hospitalId: Long): List<UnprocessAccidentResponse> {
@@ -199,12 +200,6 @@ class AccidentService(
             mostAccidentsOrccuredMonth = mostAccidentsOrccuredMonth,
             increaseRateByAverage = increaseRateByAverage,
         )
-    }
-
-    @Transactional
-    fun processAccident(accidentId: Long) {
-        val accident = accidentRepository.findByIdOrThrow(accidentId)
-        accident.process()
     }
 
     fun getAges(): List<AgeResponse> {
