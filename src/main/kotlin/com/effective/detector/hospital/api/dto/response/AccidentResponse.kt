@@ -25,11 +25,11 @@ data class AccidentResponse(
                 date = accident.startTime.toLocalDate(),
                 type = TypeResponse(
                     id = accident.type!!.id,
-                    name = accident.type!!.value,
+                    content = accident.type!!.value,
                 ),
                 age = AgeResponse(
                     id = accident.age!!.id,
-                    name = accident.age!!.value,
+                    content = accident.age!!.value,
                 ),
             )
         }
@@ -38,13 +38,13 @@ data class AccidentResponse(
 
 data class TypeResponse(
     val id: Long,
-    val name: String,
+    val content: String,
 ) {
     companion object {
         fun from(type: AccidentType): TypeResponse {
             return TypeResponse(
                 id = type.id,
-                name = type.value,
+                content = type.value,
             )
         }
     }
@@ -52,13 +52,13 @@ data class TypeResponse(
 
 data class AgeResponse(
     val id: Long,
-    val name: String,
+    val content: String,
 ) {
     companion object {
         fun from(type: AgeType): AgeResponse {
             return AgeResponse(
                 id = type.id,
-                name = type.value,
+                content = type.value,
             )
         }
     }

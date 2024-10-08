@@ -23,6 +23,7 @@ class Slot(
     }
 
     fun remove() {
+        camera?.slot = null
         this.camera = null
     }
 }
