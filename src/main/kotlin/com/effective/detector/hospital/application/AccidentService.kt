@@ -112,8 +112,8 @@ class AccidentService(
         accident.update(AccidentType.from(typeId), AgeType.from(ageId))
     }
 
-    fun getUnprocessAccident(hospitalId: Long): List<AccidentResponse> {
-        return accidentRepository.findAllByHospitalIdAndUnprocess(hospitalId).map { AccidentResponse.from(it) }
+    fun getUnprocessAccident(hospitalId: Long): List<UnprocessAccidentResponse> {
+        return accidentRepository.findAllByHospitalIdAndUnprocess(hospitalId).map { UnprocessAccidentResponse.from(it) }
     }
 
     fun getYearByExistAccidentHospital(hospitalId: Long): List<Int> {

@@ -19,11 +19,11 @@ class Accident(
 
     @Convert(converter = AccidentTypeConverter::class)
     @Column(nullable = false)
-    var type: AccidentType? = AccidentType.ETC,
+    var type: AccidentType? = null,
 
     @Convert(converter = AgeConverter::class)
     @Column(nullable = false)
-    var age: AgeType? = AgeType.AGE_NONE,
+    var age: AgeType? = null,
 
     @Column(nullable = false)
     var isProcess: Boolean = false,

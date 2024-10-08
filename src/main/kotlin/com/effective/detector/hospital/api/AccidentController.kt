@@ -5,6 +5,7 @@ import com.effective.detector.hospital.api.dto.request.AccidentChangeRequest
 import com.effective.detector.hospital.api.dto.response.AccidentResponse
 import com.effective.detector.hospital.api.dto.response.TypeResponse
 import com.effective.detector.hospital.api.dto.response.AgeResponse
+import com.effective.detector.hospital.api.dto.response.UnprocessAccidentResponse
 import com.effective.detector.hospital.application.AccidentService
 import com.effective.detector.hospital.application.ValidateService
 import com.effective.detector.member.domain.Member
@@ -70,7 +71,7 @@ class AccidentController(
     fun getUnprocessAccident(
         @PathVariable hospitalId: Long,
         @LoginMember member: Member,
-    ): ResponseEntity<List<AccidentResponse>> {
+    ): ResponseEntity<List<UnprocessAccidentResponse>> {
         validateService.checkMemberHospital(member, hospitalId)
         return ResponseEntity.ok(accidentService.getUnprocessAccident(hospitalId))
     }
