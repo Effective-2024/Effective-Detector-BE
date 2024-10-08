@@ -1,102 +1,70 @@
 package com.effective.detector.common.handler
 
-import com.effective.detector.common.util.findByIdOrThrow
 import com.effective.detector.common.util.logInfo
-import com.effective.detector.hospital.domain.CameraRepository
+import com.effective.detector.hospital.application.AccidentService
 import com.effective.detector.image.application.ImageService
 import com.google.gson.Gson
 import org.springframework.amqp.rabbit.core.RabbitTemplate
-import org.springframework.messaging.simp.SimpMessagingTemplate
-import org.springframework.web.socket.BinaryMessage
 import org.springframework.web.socket.TextMessage
 import org.springframework.web.socket.WebSocketSession
 import org.springframework.web.socket.handler.BinaryWebSocketHandler
-import java.io.ByteArrayInputStream
-import java.io.InputStream
-import java.nio.ByteBuffer
+import java.io.IOException
 import java.util.Base64
 
 class WebSocketImageStreamHandler(
     private val rabbitTemplate: RabbitTemplate,
     private val imageService: ImageService,
-    private val messagingTemplate: SimpMessagingTemplate,
+    private val accidentService: AccidentService,
     private val gson: Gson,
-    private val cameraRepository: CameraRepository,
 ) : BinaryWebSocketHandler() {
 
     companion object {
         const val QUEUE_NAME_PREFIX = "image-queue"
     }
 
-    private val sessionQueueMap = mutableMapOf<String, String>() // 세션 ID와 큐 이름 매핑
-    private val cameraIdMap = mutableMapOf<String, Long>() // 세션 ID 와 카메라 ID 매핑
-
-    override fun handleBinaryMessage(session: WebSocketSession, message: BinaryMessage) {
-        val payload: ByteBuffer = message.payload
-        val inputStream: InputStream = ByteArrayInputStream(payload.array())
-
-        val queueName = sessionQueueMap[session.id]
-        val readBytes = inputStream.readBytes()
-        imageService.sendMessage(readBytes, queueName!!)
-        cameraIdMap[session.id]?.let { cameraId ->
-            sendClientImage(cameraId, readBytes)
-        }
-        session.sendMessage(TextMessage("Image Received Successfully."))
-    }
-
     override fun handleTextMessage(session: WebSocketSession, message: TextMessage) {
         try {
-            logInfo("Received message: ${message.payload}")
+            logInfo("Received message")
             val accidentDto = gson.fromJson(message.payload, AccidentDto::class.java)
-
-            if (!accidentDto.isAccident) {
-                cameraIdMap[session.id] = accidentDto.cameraId
-                session.sendMessage(TextMessage("Id Setting Successfully."))
+            val queueName = "$QUEUE_NAME_PREFIX-${accidentDto.hospitalId}-${accidentDto.cameraId}"
+            existQueueOrExecute(queueName)
+            if (accidentDto.isAccident) {
+                accidentService.accident(queueName, accidentDto.hospitalId, accidentDto.cameraId)
+                session.sendMessage(TextMessage("Accident Received Successfully."))
                 return
             }
-            val queueName = sessionQueueMap[session.id]
-            imageService.accident(queueName!!, accidentDto.hospitalId, accidentDto.cameraId)
-            session.sendMessage(TextMessage("Accident Received Successfully."))
+            val decodedBytes: ByteArray = Base64.getDecoder().decode(accidentDto.encodedImage)
+            imageService.sendMessage(decodedBytes, queueName, accidentDto.hospitalId, accidentDto.cameraId)
+            session.sendMessage(TextMessage("Image Received Successfully."))
         } catch (e: Exception) {
             e.printStackTrace()
             session.sendMessage(TextMessage("""{"status": "error", "message": "Invalid JSON"}"""))
         }
     }
 
-    private fun sendClientImage(cameraId: Long, readBytes: ByteArray) {
-        val camera = cameraRepository.findByIdOrThrow(cameraId)
-        val topicPath = "/ws/topic/image/hospitals/${camera.hospital.id}/cameras/$cameraId"
-        logInfo("Send WebSocket STOMP Message To Path: $topicPath")
-        val base64EncodedImage = Base64.getEncoder().encodeToString(readBytes)
-        messagingTemplate.convertAndSend(
-            topicPath,
-            ImageMessageDto(
-                encodedImage = base64EncodedImage
-            )
-        )
+    private fun existQueueOrExecute(queueName: String) {
+        rabbitTemplate.execute { channel ->
+            try {
+                channel.queueDeclarePassive(queueName) // 큐가 존재하는지 확인 (큐가 없으면 IOException 발생)
+                logInfo("Queue '$queueName' already exists.")
+            } catch (e: IOException) { // 큐가 없을 때 예외가 발생하므로 큐를 선언
+                logInfo("Queue '$queueName' does not exist. Declaring the queue.")
+                channel.queueDeclare(queueName, false, true, true, null)
+            }
+        }
     }
 
     override fun afterConnectionEstablished(session: WebSocketSession) {
-        val queueName = "$QUEUE_NAME_PREFIX-${session.id}"
-        rabbitTemplate.execute {
-            it.queueDeclare(queueName, false, true, true, null)
-        }
-        sessionQueueMap[session.id] = queueName
         logInfo("WebSocket Image Stream Connection Established.")
     }
 
     override fun afterConnectionClosed(session: WebSocketSession, status: org.springframework.web.socket.CloseStatus) {
-        val queueName = sessionQueueMap.remove(session.id)
-        if (queueName != null) {
-            rabbitTemplate.execute {
-                it.queueDelete(queueName)
-            }
-        }
         logInfo("WebSocket Image Stream Connection Closed.")
     }
 }
 
 data class AccidentDto(
+    val encodedImage: String?,
     val hospitalId: Long,
     val cameraId: Long,
     val isAccident: Boolean,

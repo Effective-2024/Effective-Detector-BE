@@ -48,6 +48,9 @@ dependencies {
 
     // Jcodec
     implementation("org.jcodec:jcodec-javase:0.2.5")
+    implementation("javax.xml.bind:jaxb-api:2.3.1")
+    implementation("org.glassfish.jaxb:jaxb-runtime:2.3.1")
+    implementation("javax.activation:activation:1.1.1")
 
     // S3
     implementation("com.amazonaws:aws-java-sdk-s3:1.12.520")
