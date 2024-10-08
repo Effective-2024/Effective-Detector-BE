@@ -19,6 +19,7 @@ class WebSocketStompConfig : WebSocketMessageBrokerConfigurer {
         registry.addEndpoint("/ws")
             .setAllowedOrigins(
                 "http://localhost:3000",
+                "https://teameffective.link"
             )
             .withSockJS()
     }
