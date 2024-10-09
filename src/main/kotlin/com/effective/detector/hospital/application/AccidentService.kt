@@ -7,9 +7,7 @@ import com.effective.detector.common.util.logError
 import com.effective.detector.common.util.logInfo
 import com.effective.detector.hospital.api.dto.response.*
 import com.effective.detector.hospital.domain.*
-import com.effective.detector.image.application.AccidentMessageDto
-import com.effective.detector.image.application.CameraMessageDto
-import com.effective.detector.image.application.ImageMessageDto
+import com.effective.detector.image.application.*
 import net.nurigo.java_sdk.exceptions.CoolsmsException
 import org.jcodec.api.SequenceEncoder
 import org.jcodec.common.io.NIOUtils
@@ -45,6 +43,7 @@ class AccidentService(
     private val messagingTemplate: SimpMessagingTemplate,
     private val coolSmsSender: net.nurigo.java_sdk.api.Message,
     private val rabbitTemplate: RabbitTemplate,
+    private val mikeRepository: MikeRepository,
 ) {
 
     @Value("\${video-prefix}")
@@ -211,14 +210,14 @@ class AccidentService(
     }
 
     @Transactional
-    fun accident(queueName: String, hospitalId: Long, cameraId: Long) {
+    fun thermalAccident(queueName: String, hospitalId: Long, cameraId: Long) {
         try {
             val outputFilePath = "${System.getProperty("user.dir")}/${randomUUID()}-video.mp4"
             val timeInfo = convertImageToVideo(queueName, outputFilePath) ?: return // 30초 내의 이미지들을 영상으로 변환
             val camera = cameraRepository.findByIdOrThrow(cameraId)
             val videoUrl = uploadToStorage(hospitalId, camera, timeInfo, outputFilePath) // 영상을 S3에 저장하고 DB 테이블에 정보들 저장.
             //sendVideoMessageToUser(hospitalId, camera, videoUrl) // 사고 발생 영상을 문자로 전송. TODO: 시연시 활성화.
-            sendClientMessage(hospitalId, camera) // 클라이언트로 사고 발생 알림 보내기
+            sendClientMessage("/ws/topic/accident/hospitals/$hospitalId", hospitalId, camera) // 클라이언트로 사고 발생 알림 보내기
         } catch (exception: Exception) {
             logError("RabbitMqMessage Handling Error", exception)
         }
@@ -345,9 +344,8 @@ class AccidentService(
         }
     }
 
-    private fun sendClientMessage(hospitalId: Long, camera: Camera) {
-        val topicPath = "/ws/topic/accident/hospitals/$hospitalId"
-        logInfo("Send WebSocket STOMP Message To Path: $topicPath")
+    private fun sendClientMessage(topicPath: String, hospitalId: Long, camera: Camera) {
+        logInfo("Send WebSocket STOMP Thermal Message To Path: $topicPath")
         messagingTemplate.convertAndSend(
             topicPath,
             AccidentMessageDto(
@@ -355,6 +353,36 @@ class AccidentService(
                 camera = CameraMessageDto(
                     id = camera.id!!,
                     content = camera.name
+                ),
+                startTime = LocalDateTime.now(),
+                endTime = LocalDateTime.now()
+            )
+        )
+    }
+
+    @Transactional
+    fun audioAccident(hospitalId: Long, mikeId: Long) {
+        hospitalRepository.findByIdOrThrow(hospitalId) // 존재하는 병원인지 유효성 체크.
+        val mike = mikeRepository.findByIdOrThrow(mikeId)
+        accidentRepository.save(
+            Accident(
+                startTime = LocalDateTime.now(),
+                endTime = LocalDateTime.now(),
+                mike = mike
+            )
+        )
+        sendClientMessage("/ws/topic/accident/hospitals/$hospitalId/audio", hospitalId, mike) // 클라이언트로 사고 발생 알림 보내기
+    }
+
+    private fun sendClientMessage(topicPath: String, hospitalId: Long, mike: Mike) {
+        logInfo("Send WebSocket STOMP Audio Message To Path: $topicPath")
+        messagingTemplate.convertAndSend(
+            topicPath,
+            AudioAccidentMessageDto(
+                hospitalId = hospitalId,
+                mike = MikeMessageDto(
+                    id = mike.id!!,
+                    content = mike.name
                 ),
                 startTime = LocalDateTime.now(),
                 endTime = LocalDateTime.now()

@@ -67,7 +67,19 @@ data class AccidentMessageDto @JsonCreator constructor(
     @JsonProperty("endTime") val endTime: LocalDateTime,
 )
 
+data class AudioAccidentMessageDto @JsonCreator constructor(
+    @JsonProperty("hospitalId") val hospitalId: Long,
+    @JsonProperty("mike") val mike: MikeMessageDto,
+    @JsonProperty("startTime") val startTime: LocalDateTime,
+    @JsonProperty("endTime") val endTime: LocalDateTime,
+)
+
 data class CameraMessageDto @JsonCreator constructor(
+    @JsonProperty("id") val id: Long,
+    @JsonProperty("content") val content: String,
+)
+
+data class MikeMessageDto @JsonCreator constructor(
     @JsonProperty("id") val id: Long,
     @JsonProperty("content") val content: String,
 )

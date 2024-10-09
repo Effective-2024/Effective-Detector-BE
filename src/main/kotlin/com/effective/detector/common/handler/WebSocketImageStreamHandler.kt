@@ -19,23 +19,37 @@ class WebSocketImageStreamHandler(
 ) : BinaryWebSocketHandler() {
 
     companion object {
-        const val QUEUE_NAME_PREFIX = "image-queue"
+        const val QUEUE_NAME_PREFIX = "accident-image-queue"
     }
 
     override fun handleTextMessage(session: WebSocketSession, message: TextMessage) {
         try {
             logInfo("Received message")
             val accidentDto = gson.fromJson(message.payload, AccidentDto::class.java)
-            val queueName = "$QUEUE_NAME_PREFIX-${accidentDto.hospitalId}-${accidentDto.cameraId}"
-            existQueueOrExecute(queueName)
-            if (accidentDto.isAccident) {
-                accidentService.accident(queueName, accidentDto.hospitalId, accidentDto.cameraId)
-                session.sendMessage(TextMessage("Accident Received Successfully."))
-                return
+            when (accidentDto.type) {
+                "image" -> {
+                    val queueName = "$QUEUE_NAME_PREFIX-${accidentDto.hospitalId}-${accidentDto.cameraId}"
+                    existQueueOrExecute(queueName)
+                    val decodedBytes: ByteArray = Base64.getDecoder().decode(accidentDto.encodedImage)
+                    imageService.sendMessage(decodedBytes, queueName, accidentDto.hospitalId, accidentDto.cameraId!!)
+                    session.sendMessage(TextMessage("Image Received Successfully."))
+                    return
+                }
+
+                "thermalAccident" -> {
+                    val queueName = "$QUEUE_NAME_PREFIX-${accidentDto.hospitalId}-${accidentDto.cameraId}"
+                    existQueueOrExecute(queueName)
+                    accidentService.thermalAccident(queueName, accidentDto.hospitalId, accidentDto.cameraId!!)
+                    session.sendMessage(TextMessage("Thermal Accident Received Successfully."))
+                    return
+                }
+
+                "audioAccident" -> {
+                    accidentService.audioAccident(accidentDto.hospitalId, accidentDto.mikeId!!)
+                    session.sendMessage(TextMessage("Audio Accident Received Successfully."))
+                    return
+                }
             }
-            val decodedBytes: ByteArray = Base64.getDecoder().decode(accidentDto.encodedImage)
-            imageService.sendMessage(decodedBytes, queueName, accidentDto.hospitalId, accidentDto.cameraId)
-            session.sendMessage(TextMessage("Image Received Successfully."))
         } catch (e: Exception) {
             e.printStackTrace()
             session.sendMessage(TextMessage("""{"status": "error", "message": "Invalid JSON"}"""))
@@ -49,7 +63,7 @@ class WebSocketImageStreamHandler(
                 logInfo("Queue '$queueName' already exists.")
             } catch (e: IOException) { // 큐가 없을 때 예외가 발생하므로 큐를 선언
                 logInfo("Queue '$queueName' does not exist. Declaring the queue.")
-                channel.queueDeclare(queueName, false, true, true, null)
+                channel.queueDeclare(queueName, false, false, true, null)
             }
         }
     }
@@ -64,10 +78,11 @@ class WebSocketImageStreamHandler(
 }
 
 data class AccidentDto(
+    val type: String,
     val encodedImage: String?,
     val hospitalId: Long,
-    val cameraId: Long,
-    val isAccident: Boolean,
+    val cameraId: Long? = null,
+    val mikeId: Long? = null,
 )
 
 data class ImageMessageDto(

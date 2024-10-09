@@ -9,7 +9,7 @@ import java.time.LocalDateTime
 @Entity
 class Accident(
     @Column(nullable = false)
-    val videoUrl: String,
+    val videoUrl: String? = null,
 
     @Column(nullable = false)
     val startTime: LocalDateTime,
@@ -30,7 +30,11 @@ class Accident(
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "camera_id", nullable = false)
-    val camera: Camera,
+    val camera: Camera? = null,
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "mike_id", nullable = false)
+    val mike: Mike? = null,
 ) : BaseEntity() {
 
     fun update(accidentType: AccidentType, ageType: AgeType) {

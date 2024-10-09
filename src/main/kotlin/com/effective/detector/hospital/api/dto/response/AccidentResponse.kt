@@ -19,7 +19,7 @@ data class AccidentResponse(
         fun from(accident: Accident): AccidentResponse {
             return AccidentResponse(
                 id = accident.id!!,
-                videoUrl = accident.videoUrl,
+                videoUrl = accident.videoUrl ?: "",
                 startTime = accident.startTime,
                 endTime = accident.endTime,
                 date = accident.startTime.toLocalDate(),

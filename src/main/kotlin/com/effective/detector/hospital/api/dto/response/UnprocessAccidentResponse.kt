@@ -12,7 +12,7 @@ data class UnprocessAccidentResponse(
         fun from(accident: Accident): UnprocessAccidentResponse {
             return UnprocessAccidentResponse(
                 id = accident.id!!,
-                videoUrl = accident.videoUrl,
+                videoUrl = accident.videoUrl ?: "",
                 startDate = accident.startTime.toString(),
                 camera = CameraResponse.from(accident.camera)!!,
             )

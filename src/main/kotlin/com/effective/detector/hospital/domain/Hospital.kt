@@ -42,6 +42,9 @@ class Hospital(
     val cameras: List<Camera> = mutableListOf(),
 
     @OneToMany(mappedBy = "hospital", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
+    val mikes: List<Mike> = mutableListOf(),
+
+    @OneToMany(mappedBy = "hospital", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
     val slots: MutableList<Slot> = mutableListOf(),
 ) : BaseEntity() {
 
