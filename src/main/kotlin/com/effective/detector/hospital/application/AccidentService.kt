@@ -126,8 +126,7 @@ class AccidentService(
         val totalAccidentCount = accidentRepository.getTotalAccidentCountForYear(currentYear)
         val lastYearAccidentCount = accidentRepository.getTotalAccidentCountForYear(lastYear)
 
-        val primaryReason =
-            accidentRepository.getPrimaryReasonForAccidents(currentYear) ?: PrimaryReasonResponse(0, "미상")
+        val primaryReason = accidentRepository.getPrimaryReasonForAccidents(currentYear)[0]
 
         val increaseRateByLastYear = if (lastYearAccidentCount != 0L) {
             ((totalAccidentCount - lastYearAccidentCount).toDouble() / lastYearAccidentCount) * 100
@@ -162,9 +161,7 @@ class AccidentService(
         val totalAccidentCount = accidentRepository.getTotalAccidentCountByHospitalId(hospitalId, currentYear)
         val lastYearAccidentCount = accidentRepository.getTotalAccidentCountByHospitalId(hospitalId, lastYear)
 
-        val primaryReason =
-            accidentRepository.getPrimaryReasonForAccidentsByHospitalId(hospitalId, currentYear)
-                ?: PrimaryReasonResponse(0, "미상")
+        val primaryReason = accidentRepository.getPrimaryReasonForAccidentsByHospitalId(hospitalId, currentYear)[0]
 
         val increaseRateByLastYear = if (lastYearAccidentCount != 0L) {
             ((totalAccidentCount - lastYearAccidentCount).toDouble() / lastYearAccidentCount) * 100

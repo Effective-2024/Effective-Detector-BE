@@ -66,7 +66,7 @@ interface AccidentRepository : JpaRepository<Accident, Long> {
         ORDER BY COUNT(a) DESC
     """
     )
-    fun getPrimaryReasonForAccidents(year: Int): PrimaryReasonResponse?
+    fun getPrimaryReasonForAccidents(year: Int): List<PrimaryReasonResponse>
 
     @Query(
         """
@@ -75,9 +75,10 @@ interface AccidentRepository : JpaRepository<Accident, Long> {
         WHERE a.camera.hospital.id = :hospitalId AND YEAR(a.startTime) = :year
         GROUP BY a.type
         ORDER BY COUNT(a) DESC
+        LIMIT 1
     """
     )
-    fun getPrimaryReasonForAccidentsByHospitalId(hospitalId: Long, year: Int): PrimaryReasonResponse?
+    fun getPrimaryReasonForAccidentsByHospitalId(hospitalId: Long, year: Int): List<PrimaryReasonResponse>
 
     @Query(
         """
