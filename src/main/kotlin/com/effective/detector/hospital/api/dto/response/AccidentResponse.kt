@@ -14,6 +14,8 @@ data class AccidentResponse(
     val date: LocalDate,
     val type: TypeResponse,
     val age: AgeResponse,
+    val camera: CameraResponse?,
+    val mike: MikeResponse?,
 ) {
     companion object {
         fun from(accident: Accident): AccidentResponse {
@@ -31,6 +33,8 @@ data class AccidentResponse(
                     id = accident.age!!.id,
                     content = accident.age!!.value,
                 ),
+                camera = CameraResponse.from(accident.camera),
+                mike = MikeResponse.from(accident.mike),
             )
         }
     }

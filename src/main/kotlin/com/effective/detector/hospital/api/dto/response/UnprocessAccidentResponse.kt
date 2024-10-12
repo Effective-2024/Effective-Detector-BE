@@ -6,7 +6,8 @@ data class UnprocessAccidentResponse(
     val id: Long,
     val videoUrl: String,
     val startDate: String,
-    val camera: CameraResponse,
+    val camera: CameraResponse?,
+    val mike: MikeResponse?,
 ) {
     companion object {
         fun from(accident: Accident): UnprocessAccidentResponse {
@@ -14,7 +15,8 @@ data class UnprocessAccidentResponse(
                 id = accident.id!!,
                 videoUrl = accident.videoUrl ?: "",
                 startDate = accident.startTime.toString(),
-                camera = CameraResponse.from(accident.camera)!!,
+                camera = CameraResponse.from(accident.camera),
+                mike = MikeResponse.from(accident.mike),
             )
         }
     }
