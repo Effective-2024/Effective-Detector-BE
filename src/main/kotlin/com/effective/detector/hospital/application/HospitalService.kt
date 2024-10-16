@@ -1,5 +1,7 @@
 package com.effective.detector.hospital.application
 
+import com.effective.detector.common.error.BusinessError
+import com.effective.detector.common.error.BusinessException
 import com.effective.detector.common.util.findByIdOrThrow
 import com.effective.detector.hospital.api.dto.response.AccidentMonthlyResponse
 import com.effective.detector.hospital.api.dto.response.AccidentYearlyResponse
@@ -74,6 +76,9 @@ class HospitalService(
             return
         }
         val camera = cameraRepository.findByIdOrThrow(cameraId)
+        if (hospital.hasSlot(camera)) {
+            throw BusinessException(BusinessError.SLOT_CAMERA_DUPLICATED)
+        }
         slot.change(camera)
     }
 

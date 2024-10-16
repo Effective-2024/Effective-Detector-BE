@@ -20,6 +20,7 @@ enum class BusinessError(
     HOSPITAL_TEL_DUPLICATED(HttpStatus.CONFLICT, "해당 전화번호는 이미 등록되어 있습니다."),
     HOSPITAL_NOT_FOUND(HttpStatus.NOT_FOUND, "병원을 찾을 수 없습니다."),
     SLOT_NOT_FOUND(HttpStatus.NOT_FOUND, "슬롯을 찾을 수 없습니다."),
+    SLOT_CAMERA_DUPLICATED(HttpStatus.CONFLICT, "해당 카메라는 이미 슬롯에 등록되어 있습니다."),
 
     // Auth
     ID_PASSWORD_AUTH_FAILED(HttpStatus.UNAUTHORIZED, "아이디 또는 비밀번호가 틀렸습니다."),

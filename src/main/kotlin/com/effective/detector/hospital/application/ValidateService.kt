@@ -23,6 +23,6 @@ class ValidateService(
 
     fun checkMemberHospitalAccident(member: Member, accidentId: Long) {
         val accident = accidentRepository.findByIdOrThrow(accidentId)
-        member.isMineHospital(accident.camera?.hospital?.id!!)
+        member.isMineHospital(accident.hospital.id!!)
     }
 }

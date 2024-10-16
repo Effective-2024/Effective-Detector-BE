@@ -65,4 +65,8 @@ class Hospital(
     fun findSlot(slot: Int): Slot {
         return slots.find { it.value == slot } ?: throw BusinessException(BusinessError.SLOT_NOT_FOUND)
     }
+
+    fun hasSlot(camera: Camera): Boolean {
+        return slots.any { it.camera == camera }
+    }
 }
