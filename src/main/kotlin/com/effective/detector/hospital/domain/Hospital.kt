@@ -46,6 +46,9 @@ class Hospital(
 
     @OneToMany(mappedBy = "hospital", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
     val slots: MutableList<Slot> = mutableListOf(),
+
+    @OneToMany(mappedBy = "hospital", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
+    val accidents: List<Accident> = mutableListOf(),
 ) : BaseEntity() {
 
     @OneToMany(mappedBy = "hospital", fetch = FetchType.EAGER, cascade = [CascadeType.ALL], orphanRemoval = true)

@@ -310,13 +310,14 @@ class AccidentService(
         startTime: LocalDateTime,
         endTime: LocalDateTime,
     ) {
-        hospitalRepository.findByIdOrThrow(hospitalId) // 존재하는 병원인지 유효성 체크.
+        val hospital = hospitalRepository.findByIdOrThrow(hospitalId) // 존재하는 병원인지 유효성 체크.
         accidentRepository.save(
             Accident(
                 videoUrl = videoUrl,
                 startTime = startTime,
                 endTime = endTime,
-                camera = camera
+                camera = camera,
+                hospital = hospital
             )
         )
     }
@@ -359,13 +360,14 @@ class AccidentService(
 
     @Transactional
     fun audioAccident(hospitalId: Long, mikeId: Long) {
-        hospitalRepository.findByIdOrThrow(hospitalId) // 존재하는 병원인지 유효성 체크.
+        val hospital = hospitalRepository.findByIdOrThrow(hospitalId) // 존재하는 병원인지 유효성 체크.
         val mike = mikeRepository.findByIdOrThrow(mikeId)
         accidentRepository.save(
             Accident(
                 startTime = LocalDateTime.now(),
                 endTime = LocalDateTime.now(),
-                mike = mike
+                mike = mike,
+                hospital = hospital
             )
         )
         sendClientMessage("/ws/topic/accident/hospitals/$hospitalId/audio", hospitalId, mike) // 클라이언트로 사고 발생 알림 보내기

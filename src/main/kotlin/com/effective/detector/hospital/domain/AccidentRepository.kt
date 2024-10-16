@@ -14,19 +14,19 @@ interface AccidentRepository : JpaRepository<Accident, Long> {
     @Query(
         "SELECT a FROM Accident a " +
                 "WHERE YEAR(a.startTime) = :year " +
-                "AND a.camera.hospital.id = :hospitalId"
+                "AND a.hospital.id = :hospitalId"
     )
     fun findAllByYearAndHospitalId(
         @Param("year") year: Int,
         @Param("hospitalId") hospitalId: Long,
     ): List<Accident>
 
-    @Query("SELECT a FROM Accident a WHERE a.camera.hospital.id = :hospitalId")
+    @Query("SELECT a FROM Accident a WHERE a.hospital.id = :hospitalId")
     fun findAllByHospitalId(
         @Param("hospitalId") hospitalId: Long,
     ): List<Accident>
 
-    @Query("SELECT a FROM Accident a WHERE a.camera.hospital.id = :hospitalId")
+    @Query("SELECT a FROM Accident a WHERE a.hospital.id = :hospitalId")
     fun findAllByHospitalId(
         @Param("hospitalId") hospitalId: Long,
         pageable: Pageable,
@@ -34,7 +34,7 @@ interface AccidentRepository : JpaRepository<Accident, Long> {
 
     @Query(
         "SELECT a FROM Accident a " +
-                "WHERE a.camera.hospital.id = :hospitalId " +
+                "WHERE a.hospital.id = :hospitalId " +
                 "AND a.isProcess = false"
     )
     fun findAllByHospitalIdAndUnprocess(@Param("hospitalId") hospitalId: Long): List<Accident>
@@ -42,7 +42,7 @@ interface AccidentRepository : JpaRepository<Accident, Long> {
     @Query("SELECT DISTINCT EXTRACT(YEAR FROM a.startTime) FROM Accident a ORDER BY EXTRACT(YEAR FROM a.startTime) DESC")
     fun findDistinctYears(): List<Int>
 
-    @Query("SELECT DISTINCT EXTRACT(YEAR FROM a.startTime) FROM Accident a WHERE a.camera.hospital.id = :hospitalId ORDER BY EXTRACT(YEAR FROM a.startTime) DESC")
+    @Query("SELECT DISTINCT EXTRACT(YEAR FROM a.startTime) FROM Accident a WHERE a.hospital.id = :hospitalId ORDER BY EXTRACT(YEAR FROM a.startTime) DESC")
     fun findDistinctYearsByHospitalId(hospitalId: Long): List<Int>
 
     @Query(
@@ -54,7 +54,7 @@ interface AccidentRepository : JpaRepository<Accident, Long> {
     )
     fun getTotalAccidentCountForYear(year: Int): Long
 
-    @Query("SELECT COUNT(a) FROM Accident a WHERE a.camera.hospital.id = :hospitalId AND YEAR(a.startTime) = :year")
+    @Query("SELECT COUNT(a) FROM Accident a WHERE a.hospital.id = :hospitalId AND YEAR(a.startTime) = :year")
     fun getTotalAccidentCountByHospitalId(hospitalId: Long, year: Int): Long
 
     @Query(
@@ -72,7 +72,7 @@ interface AccidentRepository : JpaRepository<Accident, Long> {
         """
         SELECT new com.effective.detector.hospital.api.dto.response.PrimaryReasonResponse(a.type)
         FROM Accident a
-        WHERE a.camera.hospital.id = :hospitalId AND YEAR(a.startTime) = :year
+        WHERE a.hospital.id = :hospitalId AND YEAR(a.startTime) = :year
         GROUP BY a.type
         ORDER BY COUNT(a) DESC
         LIMIT 1
@@ -97,7 +97,7 @@ interface AccidentRepository : JpaRepository<Accident, Long> {
         SELECT 
             YEAR(a.startTime), MONTH(a.startTime)
         FROM Accident a
-        WHERE a.camera.hospital.id = :hospitalId AND YEAR(a.startTime) = :year
+        WHERE a.hospital.id = :hospitalId AND YEAR(a.startTime) = :year
         GROUP BY YEAR(a.startTime), MONTH(a.startTime)
         ORDER BY COUNT(a) DESC
     """
@@ -107,6 +107,6 @@ interface AccidentRepository : JpaRepository<Accident, Long> {
     @Query("SELECT COUNT(a) FROM Accident a WHERE a.type = 'MALFUNCTION' AND YEAR(a.startTime) = :year")
     fun getMalfunctionAccidentCount(year: Int): Long
 
-    @Query("SELECT COUNT(a) FROM Accident a WHERE a.type = 'MALFUNCTION' AND a.camera.hospital.id = :hospitalId AND YEAR(a.startTime) = :year")
+    @Query("SELECT COUNT(a) FROM Accident a WHERE a.type = 'MALFUNCTION' AND a.hospital.id = :hospitalId AND YEAR(a.startTime) = :year")
     fun getMalfunctionAccidentCountByHospitalId(hospitalId: Long, year: Int): Long
 }

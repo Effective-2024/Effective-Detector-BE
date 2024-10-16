@@ -29,6 +29,10 @@ class Accident(
     var isProcess: Boolean = false,
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "hospital_id", nullable = false)
+    val hospital: Hospital,
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "camera_id", nullable = false)
     val camera: Camera? = null,
 
